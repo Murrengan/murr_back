@@ -1,0 +1,9 @@
+.idea/
+__pycache__/
+db.sqlite3
+*/migrations/*
+media/*
+venv/
+!media/default_murren_avatar.png
+!media/tanochka.jpg
+staticfiles/

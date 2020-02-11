@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - murr_nginx_data_volume:/usr/share/nginx/html
+  db:
+    image: postgres:11
+    volumes:
+      - murr_postgres_data_volume:/var/lib/postgresql/data/
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - SECRET_KEY=+ownf%0op*r)rytn0^u38y7sbp_w6nf-uf9cbtm0sk2o#b1^bj
+    volumes:
+      - .:/murr_workdir_for_docker
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - nginx
+volumes:
+  murr_postgres_data_volume:
+  murr_nginx_data_volume:

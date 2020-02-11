@@ -1,0 +1,17 @@
+server {
+
+        listen 80;
+        server_name murrengan.ru;
+        root /home/murrengan/murr_front/dist;
+
+    location /admin/ {
+
+        include proxy_params;
+        proxy_pass http://unix:/home/murrengan/murr_back/murr_nginx_gunicorn_layer.sock;
+    }
+
+    location /static/  {
+
+        alias /home/murrengan/murr_back/staticfiles/;
+    }
+}
