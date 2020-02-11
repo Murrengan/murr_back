@@ -84,9 +84,9 @@ WSGI_APPLICATION = 'murr_back.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
+        'NAME': 'murr_bd',
+        'USER': 'murr',
+        'HOST': 'localhost',
         'PORT': 5432,
     }
 }
