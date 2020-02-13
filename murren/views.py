@@ -4,6 +4,8 @@ from django.http import HttpResponse, JsonResponse
 from django.core.mail import EmailMessage
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
 import json
 
 # 3rd party
@@ -14,6 +16,7 @@ from rest_framework.views import APIView
 # local
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
 from .forms import MurrenSignupForm
+from django.conf import settings
 
 Murren = get_user_model()
 
@@ -46,7 +49,7 @@ class PublicMurrenInfo(APIView):
 class GetAllMurrens(APIView):
 
     def get(self, request):
-        qs = Murren.objects.all()
+        qs = Murren.objects.filter(is_active=True)
         serializer = MurrenSerializers(qs, many=True)
         return Response(serializer.data)
 
@@ -86,11 +89,12 @@ def murren_register(request):
             user.set_password(murren_data.get('password'))
             user.save()
 
-            message = 'http://127.0.0.1:8080' + '/murren_email_activate/?activation_code=' \
+            message = settings.ALLOWED_HOSTS[0] + '/murren_email_activate/?activation_code=' \
                       + urlsafe_base64_encode(force_bytes(user.pk))
-            subject = 'Активация аккаунта Муррена'
-            email = EmailMessage(subject, message, to=[murren_data.get('email')])
-            email.send()
+            subject = '[murrengan] Активация аккаунта Муррена'
+            html_data = render_to_string('activation_email.html', {'uri': message, 'murren_name': user.username})
+            send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>',
+                      [murren_data.get('email')], html_message=html_data)
 
             return JsonResponse({'is_murren_created': 'true'})
 

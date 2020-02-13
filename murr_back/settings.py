@@ -14,7 +14,7 @@ SECRET_KEY = '+ownf%0op*r)rytn0^u38y7sbp_w6nf-uf9cbtm0sk2o#b1^bj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['http://murrengan.ru', '*']
 
 # Application definition
 
@@ -57,7 +57,7 @@ ROOT_URLCONF = 'murr_back.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -143,6 +143,8 @@ CORS_ORIGIN_WHITELIST = [
 
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://35.230.139.201",
+    "http://www.murrengan.ru/",
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -150,9 +152,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'murrengan.test@gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_PASSWORD = 'oglhgqibzqvjszab'
+EMAIL_HOST_PASSWORD = 'iufotejcfyojsgby'
 
-DEFAULT_FROM_EMAIL = 'Письмо от Мурренган <murrengan.test@gmail.com>'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 REST_FRAMEWORK = {
@@ -166,7 +167,6 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
 
     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
-    # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     # 'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     # 'ROTATE_REFRESH_TOKENS': True,
 
