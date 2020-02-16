@@ -16,3 +16,4 @@ WantedBy=multi-user.target
 sudo systemctl start murr_back_gunicorn
 sudo systemctl enable murr_back_gunicorn
 sudo systemctl status murr_back_gunicorn
+sudo systemctl restart murr_back_gunicorn
