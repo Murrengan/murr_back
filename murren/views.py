@@ -75,7 +75,7 @@ def murren_register(request):
             user.save()
 
             message = base_url + '/murren_email_activate/?activation_code=' \
-                      + urlsafe_base64_encode(force_bytes(user.pk))
+                      + urlsafe_base64_encode(force_bytes(user.email))
             subject = '[murrengan] Активация аккаунта Муррена'
             html_data = render_to_string('activation_email.html', {'uri': message, 'murren_name': user.username})
             send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>',
@@ -94,8 +94,8 @@ def murren_activate(request):
         try:
 
             json_data = json.loads(request.body)
-            murren_id = force_text(urlsafe_base64_decode(json_data['murren_id']))
-            murren = Murren.objects.get(pk=murren_id)
+            murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
+            murren = Murren.objects.get(email=murren_email)
 
         except(TypeError, ValueError, OverflowError, Murren.DoesNotExist) as error:
 
@@ -156,7 +156,6 @@ def confirm_new_password(request):
         murren_password_2 = json_data['murren_password_2']
 
         if murren_password_1 != murren_password_2:
-
             return JsonResponse({'password_not_equal': 'true'})
 
         try:
