@@ -1,12 +1,12 @@
 asgiref==3.2.3
 certifi==2019.11.28
 chardet==3.0.4
-Django==3.0.1
-django-cors-headers==3.2.0
+Django==3.0.3
+django-cors-headers==3.2.1
 django-templated-mail==1.1.1
 djangorestframework==3.11.0
 djangorestframework-simplejwt==4.4.0
-idna==2.8
+idna==2.9
 Pillow==7.0.0
 psycopg2-binary==2.8.4
 PyJWT==1.7.1
