@@ -3,8 +3,8 @@ import json
 
 from django.http import JsonResponse
 
-# base_url = 'http://127.0.0.1:8080'
-base_url = 'http://murrengan.ru'
+base_url = 'http://127.0.0.1:8080'
+# base_url = 'http://murrengan.ru'
 recaptcha_server_token = '6LfLNNcUAAAAAC_GSWQztiI2NVqnJbicZI53SCE9'
 
 

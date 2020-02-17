@@ -1,3 +1,10 @@
+##
+# fail2ban helper https://easyengine.io/tutorials/nginx/fail2ban/
+##
+# in /etc/nginx/nginx.conf
+#    add limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+##
+
 server {
 
     listen 80;
@@ -24,6 +31,7 @@ server {
     location /murren/ {
 
         include proxy_params;
+        limit_req   zone=one  burst=1 nodelay;
         proxy_pass http://unix:/home/murrengan/murr_back/murr_nginx_gunicorn_layer.sock;
     }
 
