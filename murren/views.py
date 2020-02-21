@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.utils.encoding import force_bytes, force_text
@@ -152,11 +154,14 @@ def confirm_new_password(request):
         check_recaptcha(json_data['recaptchaToken'])
 
         murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
-        murren_password_1 = json_data['murren_password_1']
-        murren_password_2 = json_data['murren_password_2']
 
-        if murren_password_1 != murren_password_2:
-            return JsonResponse({'password_not_equal': 'true'})
+        murren_last_password = json_data['murren_password_1']
+        murren_new_password = json_data['murren_password_2']
+
+        if murren_last_password == murren_new_password:
+            return JsonResponse({
+                'password_equal': True
+            })
 
         try:
 
@@ -167,9 +172,9 @@ def confirm_new_password(request):
             error = error_text
             murren = None
 
-        if murren is not None:
+        if murren is not None and murren.check_password(murren_last_password):
 
-            murren.set_password(murren_password_2)
+            murren.set_password(murren_new_password)
             murren.is_active = True
             murren.save()
 
