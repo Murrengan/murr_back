@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 # local
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
-from server_settings.common import check_recaptcha, base_url
+from server_settings.common import base_url
 from .forms import MurrenSignupForm
 
 Murren = get_user_model()
@@ -56,8 +56,6 @@ def murren_register(request):
     if request.method == 'POST':
 
         json_data = json.loads(request.body)
-
-        check_recaptcha(json_data['recaptchaToken'])
 
         murren_data = {
             'username': json_data['username'],
@@ -117,7 +115,6 @@ def reset_password(request):
     if request.method == 'POST':
 
         json_data = json.loads(request.body)
-        check_recaptcha(json_data['recaptchaToken'])
 
         try:
 
@@ -149,7 +146,6 @@ def confirm_new_password(request):
     if request.method == 'POST':
 
         json_data = json.loads(request.body)
-        check_recaptcha(json_data['recaptchaToken'])
 
         murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
         murren_password_1 = json_data['murren_password_1']
