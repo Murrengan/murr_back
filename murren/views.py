@@ -136,7 +136,7 @@ def reset_password(request):
             murren_raw_code = str(user.email) + str(user.password)
             message = base_url + '/murren_email_activate/?activation_code=' \
                       + urlsafe_base64_encode(force_bytes(json.dumps({'id': user.pk, 'check': hashlib.sha1(murren_raw_code.encode('utf-8')).hexdigest()})))
-            print(message)
+
             subject = '[murrengan] Восстановление пароля Муррена'
             html_data = render_to_string('reset_email.html', {'uri': message, 'murren_name': murren.username})
             send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>', [murren.email], html_message=html_data)
