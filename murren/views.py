@@ -10,6 +10,7 @@ import json
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+import hashlib
 
 # local
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
@@ -73,9 +74,9 @@ def murren_register(request):
             user.is_active = False
             user.set_password(murren_data.get('password'))
             user.save()
-
+            murren_raw_code = str(user.email) + str(user.password)
             message = base_url + '/murren_email_activate/?activation_code=' \
-                      + urlsafe_base64_encode(force_bytes(user.email))
+                      + urlsafe_base64_encode(force_bytes(json.dumps({'id': user.pk, 'check': hashlib.sha1(murren_raw_code.encode('utf-8')).hexdigest()})))
             subject = '[murrengan] Активация аккаунта Муррена'
             html_data = render_to_string('activation_email.html', {'uri': message, 'murren_name': user.username})
             send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>',
@@ -94,14 +95,14 @@ def murren_activate(request):
         try:
 
             json_data = json.loads(request.body)
-            murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
-            murren = Murren.objects.get(email=murren_email)
+            murren_code = json.loads(force_text(urlsafe_base64_decode(json_data['murren_code'])))
+            murren = Murren.objects.get(pk=murren_code['id'])
 
         except(TypeError, ValueError, OverflowError, Murren.DoesNotExist) as error:
 
             murren = None
 
-        if murren is not None:
+        if (murren is not None) and (hashlib.sha1((str(murren.email) + str(murren.password)).encode('utf-8')).hexdigest() == murren_code['check']):
 
             murren.is_active = True
             murren.save()
@@ -132,8 +133,10 @@ def reset_password(request):
 
         if murren is not None:
 
-            message = base_url + '/set_new_password/?activation_code=' \
-                      + urlsafe_base64_encode(force_bytes(murren.email))
+            murren_raw_code = str(user.email) + str(user.password)
+            message = base_url + '/murren_email_activate/?activation_code=' \
+                      + urlsafe_base64_encode(force_bytes(json.dumps({'id': user.pk, 'check': hashlib.sha1(murren_raw_code.encode('utf-8')).hexdigest()})))
+            print(message)
             subject = '[murrengan] Восстановление пароля Муррена'
             html_data = render_to_string('reset_email.html', {'uri': message, 'murren_name': murren.username})
             send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>', [murren.email], html_message=html_data)
@@ -151,7 +154,7 @@ def confirm_new_password(request):
         json_data = json.loads(request.body)
         check_recaptcha(json_data['recaptchaToken'])
 
-        murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
+        murren_code = json.loads(force_text(urlsafe_base64_decode(json_data['murren_code'])))
         murren_password_1 = json_data['murren_password_1']
         murren_password_2 = json_data['murren_password_2']
 
@@ -160,14 +163,14 @@ def confirm_new_password(request):
 
         try:
 
-            murren = Murren.objects.get(email=murren_email)
+            murren = Murren.objects.get(pk=murren_code['id'])
 
         except(TypeError, ValueError, OverflowError, Murren.DoesNotExist) as error_text:
 
             error = error_text
             murren = None
 
-        if murren is not None:
+        if (murren is not None) and (hashlib.sha1((str(murren.email) + str(murren.password)).encode('utf-8')).hexdigest() == murren_code['check']):
 
             murren.set_password(murren_password_2)
             murren.is_active = True
