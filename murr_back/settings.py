@@ -41,6 +41,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'murr_back.middleware.CheckRecaptchaMiddleware',
 ]
 
 ROOT_URLCONF = 'murr_back.urls'
@@ -156,3 +158,10 @@ SIMPLE_JWT = {
     # with this have some problem to remove murren form db
     # 'BLACKLIST_AFTER_ROTATION': True,
 }
+
+RECAPTCHA_URL_PROTECTED = (
+    r'^murren/token_create/$',
+    r'^murren/register/$',
+    r'^murren/reset_password/$',
+    r'^murren/confirm_new_password/$',
+)
