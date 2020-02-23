@@ -133,9 +133,9 @@ def reset_password(request):
 
         if murren is not None:
 
-            murren_raw_code = str(user.email) + str(user.password)
+            murren_raw_code = str(murren.email) + str(murren.password)
             message = base_url + '/murren_email_activate/?activation_code=' \
-                      + urlsafe_base64_encode(force_bytes(json.dumps({'id': user.pk, 'check': hashlib.sha1(murren_raw_code.encode('utf-8')).hexdigest()})))
+                      + urlsafe_base64_encode(force_bytes(json.dumps({'id': murren.pk, 'check': hashlib.sha1(murren_raw_code.encode('utf-8')).hexdigest()})))
 
             subject = '[murrengan] Восстановление пароля Муррена'
             html_data = render_to_string('reset_email.html', {'uri': message, 'murren_name': murren.username})
