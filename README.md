@@ -27,6 +27,11 @@
 ```
 pip install -r requirements.txt
 ```
+### Migrations
+```
+python manage.py makemigrations murren
+python manage.py migrate
+```
 
 ### Run for development
 ```
