@@ -165,3 +165,5 @@ RECAPTCHA_URL_PROTECTED = (
     r'^murren/reset_password/$',
     r'^murren/confirm_new_password/$',
 )
+
+MURREN_PASSWORD_REPLAY = 5

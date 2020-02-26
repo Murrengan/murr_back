@@ -27,3 +27,13 @@ class Murren(AbstractUser):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.murren_avatar.path)
+
+
+class PasswordReset(models.Model):
+    murren = models.ForeignKey(Murren, on_delete=models.CASCADE)
+    token = models.CharField(max_length=64)
+    password = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.murren.username
