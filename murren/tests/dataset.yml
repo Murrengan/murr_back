@@ -1,0 +1,7 @@
+test_create_murren:
+  response_on_sign_up:
+    is_murren_created: 'true'
+  response_on_activation:
+    murren_is_active: true
+  auth_response:
+    img_url: '/media/tanochka.jpg'
