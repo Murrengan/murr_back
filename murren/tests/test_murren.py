@@ -1,5 +1,4 @@
 import json
-import re
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -8,6 +7,8 @@ from django.test import modify_settings
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+
+from murren.forms import MurrenSignupForm
 
 Murren = get_user_model()
 
@@ -34,16 +35,12 @@ def test_create_murren(api_client, yml_dataset, test_password, test_email, test_
     html_mail_body = mail.outbox[0].alternatives[0][0]
     assert test_murren_name in html_mail_body
 
-    delimiters = ('activation_code=', '</span>')
-    regex_pattern = '|'.join(map(re.escape, delimiters))
-    splitted_html_mail = re.split(regex_pattern, html_mail_body)
-    secret_code_index = splitted_html_mail.index(urlsafe_base64_encode(force_bytes(murren.email)))
-    secret_code = splitted_html_mail[secret_code_index]
-    assert secret_code in html_mail_body
+    activation_code = urlsafe_base64_encode(force_bytes(murren.email))
+    assert activation_code in html_mail_body
 
     url = reverse('murren_activate')
     data = {
-        'murren_email': secret_code
+        'murren_email': activation_code
     }
     response = api_client.post(url, data, format='json')
     assert json.loads(response.content) == yml_dataset['test_create_murren']['response_on_activation']
@@ -65,3 +62,39 @@ def test_create_murren(api_client, yml_dataset, test_password, test_email, test_
     response = api_client.get(url)
     assert response.status_code == 200
     assert response.data == yml_dataset['test_create_murren']['auth_response']
+
+
+@pytest.mark.django_db
+def test_short_password(yml_dataset, test_murren_name, test_email):
+    data = {
+        'username': test_murren_name,
+        'email': test_email,
+        'password': yml_dataset['test_short_password']['week_password']
+    }
+    form = MurrenSignupForm(data)
+    assert form.is_valid() is False
+    assert yml_dataset['test_short_password']['error_text'] in form.errors.get('password')
+
+
+@pytest.mark.django_db
+def test_common_password(yml_dataset, test_murren_name, test_email):
+    data = {
+        'username': test_murren_name,
+        'email': test_email,
+        'password': yml_dataset['test_common_password']['week_password']
+    }
+    form = MurrenSignupForm(data)
+    assert form.is_valid() is False
+    assert yml_dataset['test_common_password']['error_text'] in form.errors.get('password')
+
+
+@pytest.mark.django_db
+def test_numeric_password(yml_dataset, test_murren_name, test_email):
+    data = {
+        'username': test_murren_name,
+        'email': test_email,
+        'password': yml_dataset['test_numeric_password']['week_password']
+    }
+    form = MurrenSignupForm(data)
+    assert form.is_valid() is False
+    assert yml_dataset['test_numeric_password']['error_text'] in form.errors.get('password')
