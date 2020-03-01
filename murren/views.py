@@ -57,7 +57,11 @@ def murren_register(request):
 
         json_data = json.loads(request.body)
 
-        check_recaptcha(json_data['recaptchaToken'])
+        recaptcha_response = check_recaptcha(json_data['recaptchaToken'])
+
+        if recaptcha_response['recaptcha_response_problem'] is True:
+            return JsonResponse({'recaptcha_response_problem': True,
+                                 'recaptcha_response_text': recaptcha_response['recaptcha_response_text']})
 
         murren_data = {
             'username': json_data['username'],
