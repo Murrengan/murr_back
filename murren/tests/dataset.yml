@@ -5,3 +5,21 @@ test_create_murren:
     murren_is_active: true
   auth_response:
     img_url: '/media/tanochka.jpg'
+
+test_reset_password:
+  empty_body: {'ok': False, 'message': 'Тело запроса пустое'}
+  not_filed_email: {'ok': False, 'message': 'Почта нужна для восстановления пароля'}
+  empty_email: {'ok': False, 'message': 'Почта нужна для восстановления пароля'}
+  not_fround_email: {'ok': False, 'message': 'Такой почты нет в системе'}
+  not_active_murren: {'ok': True, 'message': 'Вы получите письмо с востановлением данных на эту почту, если она была подтверждена'}
+  send_email: {'ok': True, 'message': 'Вы получите письмо с востановлением данных на эту почту, если она была подтверждена'}
+
+test_confirm_new_password:
+  empty_body: {'ok': False, 'message': 'Тело запроса пустое'}
+  not_token: {'ok': False, 'message': 'Ваш запрос без токена'}
+  token_is_empty: {'ok': False, 'message': 'Ваш запрос без токена'}
+  password_is_empty: {'ok': False, 'message': 'Вы не указали пароль'}
+  token_is_error: {'ok': False, 'message': 'Ошибка токена'}
+  password_match: {'ok': False, 'message': 'Ваш новый пороль не должен совпадать с вашими старыми'}
+  password_is_already_changed: {'ok': False, 'message': 'Вы уже поменяли пароль'}
+  new_password_successful: {'ok': True, 'message': 'Пароль успешно изменен. Добро пожаловать 😎'}
