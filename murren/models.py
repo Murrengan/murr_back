@@ -27,3 +27,17 @@ class Murren(AbstractUser):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.murren_avatar.path)
+
+
+class EmailSalt(models.Model):
+    murren = models.ForeignKey(Murren, on_delete=models.CASCADE)
+    salt = models.CharField(max_length=50)
+    time = models.DateField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = ("salt")
+        verbose_name_plural = ("salts")
+
+    def __str__(self):
+        return self.salt

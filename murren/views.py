@@ -11,10 +11,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+
 # local
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
-from server_settings.common import base_url
-from .forms import MurrenSignupForm
+
+# services
+import murren.services.auth as auth
+import murren.services.email_confirm as confirm
 
 Murren = get_user_model()
 
@@ -54,123 +57,76 @@ class GetAllMurrens(APIView):
 
 def murren_register(request):
     if request.method == 'POST':
-
         json_data = json.loads(request.body)
 
-        murren_data = {
-            'username': json_data['username'],
-            'email': json_data['email'],
-            'password': json_data['password'],
-        }
+        try:
+            user = auth.register(json_data['email'], json_data['password'], json_data['username'])
+        except(TypeError, ValueError, OverflowError) as error:
+            return JsonResponse({'error_on_backend': True, 'error_text': error.args[0]})
 
-        form = MurrenSignupForm(murren_data)
-
-        if form.is_valid():
-
-            user = form.save(commit=False)
-            user.is_active = False
-            user.set_password(murren_data.get('password'))
-            user.save()
-
-            message = base_url + '/murren_email_activate/?activation_code=' \
-                      + urlsafe_base64_encode(force_bytes(user.email))
-            subject = '[murrengan] Активация аккаунта Муррена'
-            html_data = render_to_string('activation_email.html', {'uri': message, 'murren_name': user.username})
-            send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>',
-                      [murren_data.get('email')], html_message=html_data)
-
+        if not user['error']:
+            token = confirm.generate_email_token(user['user'])
+            confirm_result = confirm.send_confirm('reset_email.html', '[murrengan] Активация аккаунта Муррена', user['user'].email, 'Murrengan <murrengan.test@gmail.com>', token, user['user'], 'murren_email_activate')
             return JsonResponse({'is_murren_created': 'true'})
-
         else:
-
-            return JsonResponse(form.errors)
+            return JsonResponse(user['error_text'])
 
 
 def murren_activate(request):
     if request.method == 'POST':
-
+        json_data = json.loads(request.body)
+        
         try:
+            murren_code = json_data['murren_code']
+        except(TypeError, ValueError, OverflowError) as error:
+            return JsonResponse({'error_on_backend': True, 'error_text':error.args[0]})
 
-            json_data = json.loads(request.body)
-            murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
-            murren = Murren.objects.get(email=murren_email)
+        user = confirm.check_email_token(murren_code, 24, 3)
 
-        except(TypeError, ValueError, OverflowError, Murren.DoesNotExist) as error:
-
-            murren = None
-
-        if murren is not None:
-
-            murren.is_active = True
-            murren.save()
-
-            return JsonResponse({'murren_is_active': True})
-
+        if not user['error']:
+            if auth.activate(user['user']):
+                return JsonResponse({'murren_is_active': True})
         else:
-
-            return JsonResponse({'error_on_backend': True, 'error_text': error.args[0]})
+            return JsonResponse({'error_on_backend': True, 'error_text': user['error_text']})    
+            
 
 
 def reset_password(request):
     if request.method == 'POST':
-
         json_data = json.loads(request.body)
 
         try:
+            user = Murren.objects.get(email=json_data['email'])
+        except(TypeError, ValueError, OverflowError, Murren.DoesNotExist) as error:
+            return JsonResponse({'error_on_backend': True, 'error_text':error.args[0]})
 
-            json_data = json.loads(request.body)
-            email = json_data['email']
-            murren = Murren.objects.get(email=email)
+        token = confirm.generate_email_token(user)
 
-        except(TypeError, ValueError, OverflowError, Murren.DoesNotExist) as error_text:
+        confirm_result = confirm.send_confirm('reset_email.html', '[murrengan] Восстановление пароля Муррена', user.email, 'Murrengan <murrengan.test@gmail.com>', token, user, 'set_new_password')
 
-            error = error_text
-            murren = None
-
-        if murren is not None:
-
-            message = base_url + '/set_new_password/?activation_code=' \
-                      + urlsafe_base64_encode(force_bytes(murren.email))
-            subject = '[murrengan] Восстановление пароля Муррена'
-            html_data = render_to_string('reset_email.html', {'uri': message, 'murren_name': murren.username})
-            send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>', [murren.email], html_message=html_data)
-
+        if confirm_result:
             return JsonResponse({'email_sent_successfully': True})
-
-        else:
-
-            return JsonResponse({'error_on_backend': True, 'error_text': error.args[0]})
 
 
 def confirm_new_password(request):
     if request.method == 'POST':
-
         json_data = json.loads(request.body)
 
-        murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
-        murren_password_1 = json_data['murren_password_1']
-        murren_password_2 = json_data['murren_password_2']
+        try:
+            murren_code = json_data['murren_code']
+            murren_password_1 = json_data['murren_password_1']
+            murren_password_2 = json_data['murren_password_2']
+        except(TypeError, ValueError, OverflowError) as error:
+            return JsonResponse({'error_on_backend': True, 'error_text':error.args[0]})
 
         if murren_password_1 != murren_password_2:
             return JsonResponse({'password_not_equal': 'true'})
 
-        try:
+        user = confirm.check_email_token(murren_code, 24, 3)
 
-            murren = Murren.objects.get(email=murren_email)
-
-        except(TypeError, ValueError, OverflowError, Murren.DoesNotExist) as error_text:
-
-            error = error_text
-            murren = None
-
-        if murren is not None:
-
-            murren.set_password(murren_password_2)
-            murren.is_active = True
-            murren.save()
-
-            return JsonResponse({'password_successfully_changed': True})
-
+        if not user['error']:
+            if auth.reset_password(murren_password_1, user['user']):
+                return JsonResponse({'password_successfully_changed': True})
         else:
-
-            return JsonResponse({'error_on_backend': True, 'error_text': error.args[0]})
+             return JsonResponse({'error_on_backend': True, 'error_text': user['error_text']})
+            
