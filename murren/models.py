@@ -6,7 +6,7 @@ from django.db import models
 class Murren(AbstractUser):
 
     email = models.EmailField(unique=True)
-    murren_avatar = models.ImageField(default='default_murren_avatar.png', upload_to='murren_pics',
+    murren_avatar = models.ImageField(default='default_murren_avatar.png', upload_to='murren_pics/%Y/%m/%d/',
                                       verbose_name='Аватар Муррена')
 
     def __str__(self):

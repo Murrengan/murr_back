@@ -7,7 +7,7 @@ Murren = get_user_model()
 
 class MurrenSignupForm(ModelForm):
 
-    email = forms.EmailField(max_length=200, help_text='Required')
+    email = forms.EmailField(max_length=200, required=True)
 
     class Meta:
 

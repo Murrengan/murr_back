@@ -18,7 +18,8 @@
 <b>[develop](https://github.com/Murrengan/murr_front/tree/develop)</b> - Branch for developers. Checkout from here and implement new features</b>.
 
 <h2 align="center">In developing used:</h2>
- 
+
+* [Python 3.6.9](https://www.python.org/downloads/release/python-369/)
 * [Django 3](https://www.djangoproject.com/) as main backend framework
 * [Django REST](https://www.django-rest-framework.org/) for building Web APIs
 * [Simplejwt](https://github.com/davesque/django-rest-framework-simplejwt) for JSON Web Token authentication
