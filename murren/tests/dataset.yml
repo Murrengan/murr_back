@@ -5,3 +5,15 @@ test_create_murren:
     murren_is_active: true
   auth_response:
     img_url: '/media/tanochka.jpg'
+
+test_short_password:
+  error_text: 'This password is too short. It must contain at least 6 characters.'
+  week_password: 'foo99'
+
+test_common_password:
+  error_text: 'This password is too common.'
+  week_password: 'qwerty'
+
+test_numeric_password:
+  error_text: 'This password is entirely numeric.'
+  week_password: '123890'

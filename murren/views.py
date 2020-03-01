@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -153,6 +155,10 @@ def confirm_new_password(request):
 
         if murren_password_1 != murren_password_2:
             return JsonResponse({'password_not_equal': 'true'})
+        try:
+            validate_password(murren_password_1)
+        except ValidationError as exc:
+            return JsonResponse({'password_not_valid': True, 'password': exc.messages})
 
         try:
 
