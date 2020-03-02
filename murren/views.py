@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -6,17 +8,14 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
-import json
-
-# 3rd party
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# local
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
 from server_settings.common import base_url
 from .forms import MurrenSignupForm
+
 
 Murren = get_user_model()
 
@@ -56,30 +55,18 @@ class GetAllMurrens(APIView):
 
 def murren_register(request):
     if request.method == 'POST':
-
         json_data = json.loads(request.body)
-
-        murren_data = {
-            'username': json_data['username'],
-            'email': json_data['email'],
-            'password': json_data['password'],
-        }
-
-        form = MurrenSignupForm(murren_data)
+        form = MurrenSignupForm(json_data)
 
         if form.is_valid():
-
-            user = form.save(commit=False)
-            user.is_active = False
-            user.set_password(murren_data.get('password'))
-            user.save()
+            user = form.save(commit=True)
 
             message = base_url + '/murren_email_activate/?activation_code=' \
                       + urlsafe_base64_encode(force_bytes(user.email))
             subject = '[murrengan] Активация аккаунта Муррена'
             html_data = render_to_string('activation_email.html', {'uri': message, 'murren_name': user.username})
             send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>',
-                      [murren_data.get('email')], html_message=html_data)
+                      [user.email], html_message=html_data)
 
             return JsonResponse({'is_murren_created': 'true'})
 
