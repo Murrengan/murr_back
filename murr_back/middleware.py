@@ -23,7 +23,7 @@ class CheckRecaptchaMiddleware:
             json_data = json.loads(request.body)
 
             if 'recaptchaToken' in json_data:
-                check_recaptcha(json_data['recaptchaToken'])
+                return check_recaptcha(json_data['recaptchaToken'])
             else:
                 return JsonResponse(
                     {'recaptcha_response_problem': True, 'recaptcha_response_text': 'Not found recaptchaToken'}
