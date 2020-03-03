@@ -1,6 +1,8 @@
 import json
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -54,28 +56,17 @@ class GetAllMurrens(APIView):
 @require_POST
 def murren_register(request):
     json_data = json.loads(request.body)
-
-    murren_data = {
-        'username': json_data['username'],
-        'email': json_data['email'],
-        'password': json_data['password'],
-    }
-
-    form = MurrenSignupForm(murren_data)
+    form = MurrenSignupForm(json_data)
 
     if form.is_valid():
-
-        user = form.save(commit=False)
-        user.is_active = False
-        user.set_password(murren_data.get('password'))
-        user.save()
+        user = form.save(commit=True)
 
         message = base_url + '/murren_email_activate/?activation_code=' \
                   + urlsafe_base64_encode(force_bytes(user.email))
         subject = '[murrengan] Активация аккаунта Муррена'
         html_data = render_to_string('activation_email.html', {'uri': message, 'murren_name': user.username})
         send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>',
-                  [murren_data.get('email')], html_message=html_data)
+                  [user.email], html_message=html_data)
 
         return JsonResponse({'is_murren_created': 'true'})
 
@@ -146,6 +137,10 @@ def confirm_new_password(request):
 
     if murren_password_1 != murren_password_2:
         return JsonResponse({'password_not_equal': 'true'})
+    try:
+        validate_password(murren_password_1)
+    except ValidationError as exc:
+        return JsonResponse({'password_not_valid': True, 'password': exc.messages})
 
     try:
 
