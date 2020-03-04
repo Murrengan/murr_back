@@ -39,6 +39,11 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+### Run tests
+```
+pytest
+```
+
 <br/>
 
 <h2 align="center">Download, train and take part in improving the functionality!❤</h2>
