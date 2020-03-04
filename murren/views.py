@@ -9,6 +9,8 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.http import require_POST
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -45,12 +47,10 @@ class PublicMurrenInfo(APIView):
         return Response(serializer.data)
 
 
-class GetAllMurrens(APIView):
-
-    def get(self, request):
-        qs = Murren.objects.filter(is_active=True)
-        serializer = MurrenSerializers(qs, many=True)
-        return Response(serializer.data)
+class GetAllMurrens(ListAPIView):
+    queryset = Murren.objects.filter(is_active=True).order_by('-date_joined')
+    serializer_class = MurrenSerializers
+    pagination_class = PageNumberPagination
 
 
 @require_POST
