@@ -14,10 +14,9 @@ import string
 import time
 import hmac
 from uuid import uuid4
-import bcrypt
+import crypt
 from datetime import datetime, timedelta
 
-# local 
 from common_helpers.global_variables import base_url
 from murren.forms import MurrenSignupForm
 from murren.models import EmailToken
@@ -26,7 +25,7 @@ User = get_user_model()
 
 def generate_email_token(user):
     key = str(uuid4())
-    salt = str(bcrypt.gensalt())
+    salt = crypt.mksalt(crypt.METHOD_SHA512)
     token = hmac.new(key.encode(), salt.encode(), hashlib.sha256).hexdigest()
 
     EmailToken.objects.create(token=token, murren=user)   
@@ -54,7 +53,7 @@ def generate_confirm_url(type, token):
     return base_url + '/'+ type +'/?activation_code=' + token
 
 def send_confirm(template, subject, email_from, user, url):
-    html_data = render_to_string('reset_email.html', {'uri': url, 'murren_name': user.username})
+    html_data = render_to_string(template, {'uri': url, 'murren_name': user.username})
     send_mail(subject, None, email_from, [user.email], html_message=html_data)
 
     return {'error': False}

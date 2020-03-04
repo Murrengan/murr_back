@@ -5,17 +5,13 @@ from django.conf import settings
 
 import json
 
-# 3rd party
 from django.views.decorators.http import require_POST
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
-# local
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
 
-# services
 import murren.services.auth as auth
 import murren.services.email_confirm as confirm
 
@@ -67,7 +63,7 @@ def murren_register(request):
 
     if not user['error']:
         return JsonResponse({
-            'ok': True, 'message': 'Регистрация прошла успешно. Добро пожаловать 😎'
+            'ok': True, 'message': 'Регистрация прошла успешно. Вы получите письмо с подтверждением'
         })
     else:
         return JsonResponse({

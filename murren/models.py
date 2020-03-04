@@ -32,11 +32,11 @@ class Murren(AbstractUser):
 class EmailToken(models.Model):
     murren = models.ForeignKey(Murren, on_delete=models.CASCADE)
     token = models.CharField(max_length=128)
-    time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = ("token")
-        verbose_name_plural = ("tokens")
+        verbose_name = ("email_token")
+        verbose_name_plural = ("email_tokens")
 
     def __str__(self):
         return self.token

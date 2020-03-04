@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 
-# local 
 from murren.forms import MurrenSignupForm
 from murren.models import EmailToken
 
