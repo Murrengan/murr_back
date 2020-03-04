@@ -16,7 +16,7 @@ def api_client():
 @pytest.fixture
 def yml_dataset():
     dataset_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'dataset.yml')
-    stream = open(dataset_path, 'r')
+    stream = open(dataset_path, 'r', encoding='utf-8')
     return yaml.safe_load(stream)
 
 

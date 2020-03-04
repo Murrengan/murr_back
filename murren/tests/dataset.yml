@@ -1,8 +1,6 @@
 test_create_murren:
-  response_on_sign_up:
-    is_murren_created: 'true'
-  response_on_activation:
-    murren_is_active: true
+  response_on_sign_up: {'ok': True, 'message': 'Регистрация прошла успешно. Добро пожаловать 😎'}
+  response_on_activation: {'ok': True, 'message': 'Активация прошла успешно. Добро пожаловать 😎'}
   auth_response:
     img_url: '/media/tanochka.jpg'
 

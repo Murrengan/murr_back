@@ -1,4 +1,5 @@
 import json
+import re
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -12,6 +13,11 @@ from murren.forms import MurrenSignupForm
 
 Murren = get_user_model()
 
+def _token_in_mail():
+    html_mail = mail.outbox[0].alternatives[0][0]
+    token_re = re.findall(r'activation_code=([A-Za-z0-9]+(?:[\s-][A-Za-z0-9]+)*)', html_mail)
+    token = token_re[0]
+    return token
 
 @pytest.mark.django_db
 @modify_settings(MIDDLEWARE={'remove': 'murr_back.middleware.CheckRecaptchaMiddleware'})
@@ -40,12 +46,11 @@ def test_create_murren(api_client, yml_dataset, test_password, test_email, test_
     html_mail_body = mail.outbox[0].alternatives[0][0]
     assert username in html_mail_body
 
-    activation_code = urlsafe_base64_encode(force_bytes(murren.email))
-    assert activation_code in html_mail_body
-
+    activation_code = _token_in_mail()
+    
     url = reverse('murren_activate')
     data = {
-        'murren_email': activation_code,
+        'activation_code': activation_code,
     }
     response = api_client.post(url, data, format='json')
     assert json.loads(response.content) == yml_dataset['test_create_murren']['response_on_activation']

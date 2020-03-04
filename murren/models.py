@@ -27,3 +27,16 @@ class Murren(AbstractUser):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.murren_avatar.path)
+
+
+class EmailToken(models.Model):
+    murren = models.ForeignKey(Murren, on_delete=models.CASCADE)
+    token = models.CharField(max_length=128)
+    time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    class Meta:
+        verbose_name = ("token")
+        verbose_name_plural = ("tokens")
+
+    def __str__(self):
+        return self.token

@@ -168,3 +168,6 @@ RECAPTCHA_URL_PROTECTED = (
     r'^murren/reset_password/$',
     r'^murren/confirm_new_password/$',
 )
+
+EMAIL_TOKEN_LIFETIME = timedelta(hours=6)
+EMAIL_FROM = 'Murrengan <murrengan.test@gmail.com>'

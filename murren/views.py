@@ -1,21 +1,23 @@
+from django.contrib.auth import get_user_model
+from django.http import JsonResponse
+from django.core.exceptions import ValidationError
+from django.conf import settings
+
 import json
 
-from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
-from django.http import JsonResponse
-from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+# 3rd party
 from django.views.decorators.http import require_POST
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common_helpers.global_variables import base_url
+
+# local
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
-from .forms import MurrenSignupForm
+
+# services
+import murren.services.auth as auth
+import murren.services.email_confirm as confirm
 
 Murren = get_user_model()
 
@@ -52,113 +54,125 @@ class GetAllMurrens(APIView):
         serializer = MurrenSerializers(qs, many=True)
         return Response(serializer.data)
 
-
 @require_POST
 def murren_register(request):
-    json_data = json.loads(request.body)
-    form = MurrenSignupForm(json_data)
+    if not request.body:
+        return JsonResponse({
+            'ok': False, 'message': 'Тело запроса пустое'
+        })
 
-    if form.is_valid():
-        user = form.save(commit=True)
+    data = json.loads(request.body)
 
-        message = base_url + '/murren_email_activate/?activation_code=' \
-                  + urlsafe_base64_encode(force_bytes(user.email))
-        subject = '[murrengan] Активация аккаунта Муррена'
-        html_data = render_to_string('activation_email.html', {'uri': message, 'murren_name': user.username})
-        send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>',
-                  [user.email], html_message=html_data)
+    user = auth.register(data)
 
-        return JsonResponse({'is_murren_created': 'true'})
-
+    if not user['error']:
+        return JsonResponse({
+            'ok': True, 'message': 'Регистрация прошла успешно. Добро пожаловать 😎'
+        })
     else:
-
-        return JsonResponse(form.errors)
-
+        return JsonResponse({
+            'ok': False, 'message': user['error_text']
+        })
 
 @require_POST
 def murren_activate(request):
-    try:
+    if not request.body:
+        return JsonResponse({
+            'ok': False, 'message': 'Тело запроса пустое'
+        })
 
-        json_data = json.loads(request.body)
-        murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
-        murren = Murren.objects.get(email=murren_email)
+    data = json.loads(request.body)
+    
+    if 'murren_code' not in data or not data['murren_code']:
+        return JsonResponse({
+            'ok': False, 'message': 'Ваш запрос без токена'
+        })
 
-    except Murren.DoesNotExist as error:
-
-        murren = None
-
-    if murren is not None:
-
-        murren.is_active = True
-        murren.save()
-
-        return JsonResponse({'murren_is_active': True})
-
-    else:
-
-        return JsonResponse({'error_on_backend': True, 'error_text': error.args[0]})
-
+    user = confirm.check_email_token(data['murren_code'], settings.EMAIL_TOKEN_LIFETIME)
+    
+    if user['error'] and user['type'] == 'email_token':
+        return JsonResponse({
+            'ok': False, 'message': 'Ошибка токена'
+        })
+    
+    if not user['error']:
+        if auth.activate(user['user']):
+            return JsonResponse({
+                'ok': True, 'message': 'Активация прошла успешно. Добро пожаловать 😎'
+            })
+            
 
 @require_POST
 def reset_password(request):
+    if not request.body:
+        return JsonResponse({
+            'ok': False, 'message': 'Тело запроса пустое'
+        })
+    
+    data = json.loads(request.body)
+
+    if 'email' not in data or not data['email']:
+        return JsonResponse({
+            'ok': False, 'message': 'Почта нужна для восстановления пароля'
+        })
+
     try:
+        user = Murren.objects.get(email=data['email'])
+    except Murren.DoesNotExist:
+        return JsonResponse({
+            'ok': False, 'message': 'Такой почты нет в системе'
+        })
 
-        json_data = json.loads(request.body)
-        email = json_data['email']
-        murren = Murren.objects.get(email=email)
+    token = confirm.generate_email_token(user)
+    url = confirm.generate_confirm_url('set_new_password', token)
+    confirm_result = confirm.send_confirm('activation_email.html', '[murrengan] Восстановление пароля Муррена', \
+                                                                                    settings.EMAIL_FROM, user, url)
 
-    except Murren.DoesNotExist as error_text:
-
-        error = error_text
-        murren = None
-
-    if murren is not None:
-
-        message = base_url + '/set_new_password/?activation_code=' \
-                  + urlsafe_base64_encode(force_bytes(murren.email))
-        subject = '[murrengan] Восстановление пароля Муррена'
-        html_data = render_to_string('reset_email.html', {'uri': message, 'murren_name': murren.username})
-        send_mail(subject, None, 'Murrengan <murrengan.test@gmail.com>', [murren.email], html_message=html_data)
-
-        return JsonResponse({'email_sent_successfully': True})
-
-    else:
-
-        return JsonResponse({'error_on_backend': True, 'error_text': error.args[0]})
-
+    if confirm_result:
+        return JsonResponse({
+            'ok': True, 'message': 'Вы получите письмо с востановлением данных на эту почту, '
+                               'если она была подтверждена'
+        })
 
 @require_POST
 def confirm_new_password(request):
-    json_data = json.loads(request.body)
+    if not request.body:
+        return JsonResponse({
+            'ok': False, 'message': 'Тело запроса пустое'
+        })
+    
+    data = json.loads(request.body)
 
-    murren_email = force_text(urlsafe_base64_decode(json_data['murren_email']))
-    murren_password_1 = json_data['murren_password_1']
-    murren_password_2 = json_data['murren_password_2']
+    if 'token' not in data or not data['token']:
+        return JsonResponse({
+            'ok': False, 'message': 'Ваш запрос без токена'
+        })
 
-    if murren_password_1 != murren_password_2:
-        return JsonResponse({'password_not_equal': 'true'})
+    if 'password_first' not in data or not data['password_first']:
+        return JsonResponse({
+            'ok': False, 'message': 'Вы не указали пароль'
+        })
+
     try:
-        validate_password(murren_password_1)
-    except ValidationError as exc:
-        return JsonResponse({'password_not_valid': True, 'password': exc.messages})
+        validate_password(password_first)
+    except ValidationError:
+        return JsonResponse({
+            'ok': False, 'message': 'Пароль является слабым'
+        })
 
-    try:
+    if data['password_first'] != data['password_second']:
+        return JsonResponse({
+            'ok': False, 'message': 'Подтверждение не совпадает с паролем'
+        })
 
-        murren = Murren.objects.get(email=murren_email)
+    user = confirm.check_email_token(data['murren_code'], settings.EMAIL_TOKEN_LIFETIME)
 
-    except Murren.DoesNotExist as error_text:
-
-        error = error_text
-        murren = None
-
-    if murren is not None:
-
-        murren.set_password(murren_password_2)
-        murren.is_active = True
-        murren.save()
-
-        return JsonResponse({'password_successfully_changed': True})
-
+    if not user['error']:
+        if auth.reset_password(data['password_second'], user['user']):
+            return JsonResponse({
+                'ok': True, 'message': 'Пароль успешно изменен. Добро пожаловать 😎'
+            })
     else:
-
-        return JsonResponse({'error_on_backend': True, 'error_text': error.args[0]})
+        return JsonResponse({
+            'ok': False, 'message': 'Ошибка токена'
+        })
