@@ -83,12 +83,12 @@ def murren_activate(request):
 
     data = json.loads(request.body)
     
-    if 'murren_code' not in data or not data['murren_code']:
+    if 'activation_code' not in data or not data['activation_code']:
         return JsonResponse({
             'ok': False, 'message': 'Ваш запрос без токена'
         })
 
-    user = confirm.check_email_token(data['murren_code'], settings.EMAIL_TOKEN_LIFETIME)
+    user = confirm.check_email_token(data['activation_code'], settings.EMAIL_TOKEN_LIFETIME)
     
     if user['error'] and user['type'] == 'email_token':
         return JsonResponse({
