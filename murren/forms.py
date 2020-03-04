@@ -8,13 +8,13 @@ Murren = get_user_model()
 
 
 class MurrenSignupForm(ModelForm):
-
-    email = forms.EmailField(max_length=200, help_text='Required')
+    email = forms.EmailField(max_length=200, required=True)
+    password = forms.CharField(max_length=150, required=True)
+    username = forms.CharField(max_length=24, required=True)
 
     class Meta:
-
         model = Murren
-        fields = ('username', 'email', 'password')
+        fields = ('username', 'email', 'password', 'is_active')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -23,3 +23,19 @@ class MurrenSignupForm(ModelForm):
             validate_password(password)
         except ValidationError as exc:
             raise forms.ValidationError({'password': exc.messages})
+
+        cleaned_data['is_active'] = False
+        return cleaned_data
+
+    def save(self, commit=False):
+        user = super().save(commit=False)
+
+        password = self.cleaned_data.get('password')
+
+        if password:
+            user.set_password(raw_password=password)
+
+        if commit:
+            user.save()
+
+        return user

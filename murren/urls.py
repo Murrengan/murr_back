@@ -1,10 +1,7 @@
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
-
-# 3rd party
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-# local
 from .views import MurrensMethods, murren_register, murren_activate, GetAllMurrens, PublicMurrenInfo, GetTanochkaImg, \
     reset_password, confirm_new_password
 

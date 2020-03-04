@@ -4,7 +4,7 @@ import re
 from django.conf import settings
 from django.http import JsonResponse
 
-from server_settings.common import check_recaptcha
+from common_helpers.recaptcha import check_recaptcha
 
 URL_PROTECTED = []
 if hasattr(settings, 'RECAPTCHA_URL_PROTECTED'):
