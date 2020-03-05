@@ -13,9 +13,9 @@ from murren.forms import MurrenSignupForm
 
 Murren = get_user_model()
 
-def _token_in_mail():
+def _token_in_mail(type):
     html_mail = mail.outbox[0].alternatives[0][0]
-    token_re = re.findall(r'activation_code=([A-Za-z0-9]+(?:[\s-][A-Za-z0-9]+)*)', html_mail)
+    token_re = re.findall(f'{type}/([A-Za-z0-9]+(?:[\s-][A-Za-z0-9]+)*)', html_mail)
     token = token_re[0]
     return token
 
@@ -46,11 +46,11 @@ def test_create_murren(api_client, yml_dataset, test_password, test_email, test_
     html_mail_body = mail.outbox[0].alternatives[0][0]
     assert username in html_mail_body
 
-    activation_code = _token_in_mail()
+    activation_code = _token_in_mail('murren_email_activate')
     
     url = reverse('murren_activate')
     data = {
-        'activation_code': activation_code,
+        'email_token': activation_code,
     }
     response = api_client.post(url, data, format='json')
     assert json.loads(response.content) == yml_dataset['test_create_murren']['response_on_activation']

@@ -50,6 +50,7 @@ class GetAllMurrens(APIView):
         serializer = MurrenSerializers(qs, many=True)
         return Response(serializer.data)
 
+
 @require_POST
 def murren_register(request):
     if not request.body:
@@ -70,6 +71,7 @@ def murren_register(request):
             'ok': False, 'message': user['error_text']
         })
 
+
 @require_POST
 def murren_activate(request):
     if not request.body:
@@ -79,12 +81,14 @@ def murren_activate(request):
 
     data = json.loads(request.body)
     
-    if 'activation_code' not in data or not data['activation_code']:
+    if 'email_token' not in data or not data['email_token']:
         return JsonResponse({
             'ok': False, 'message': 'Ваш запрос без токена'
         })
 
-    user = confirm.check_email_token(data['activation_code'], settings.EMAIL_TOKEN_LIFETIME)
+    user = confirm.check_email_token(data['email_token'], 
+                                     'user-active', 
+                                     settings.EMAIL_TOKEN_LIFETIME)
     
     if user['error'] and user['type'] == 'email_token':
         return JsonResponse({
@@ -119,16 +123,17 @@ def reset_password(request):
             'ok': False, 'message': 'Такой почты нет в системе'
         })
 
-    token = confirm.generate_email_token(user)
+    token = confirm.generate_email_token(user, 'reset-password', user.password)
     url = confirm.generate_confirm_url('set_new_password', token)
-    confirm_result = confirm.send_confirm('activation_email.html', '[murrengan] Восстановление пароля Муррена', \
-                                                                                    settings.EMAIL_FROM, user, url)
+    confirm_result = confirm.send_confirm('activation_email.html', 
+                                          '[murrengan] Восстановление пароля Муррена',
+                                           settings.EMAIL_FROM, user, url)
 
     if confirm_result:
         return JsonResponse({
-            'ok': True, 'message': 'Вы получите письмо с востановлением данных на эту почту, '
-                               'если она была подтверждена'
+            'ok': True, 'message': 'Вы получите письмо с востановлением данных на эту почту'
         })
+
 
 @require_POST
 def confirm_new_password(request):
@@ -139,7 +144,7 @@ def confirm_new_password(request):
     
     data = json.loads(request.body)
 
-    if 'token' not in data or not data['token']:
+    if 'email_token' not in data or not data['email_token']:
         return JsonResponse({
             'ok': False, 'message': 'Ваш запрос без токена'
         })
@@ -150,7 +155,7 @@ def confirm_new_password(request):
         })
 
     try:
-        validate_password(password_first)
+        validate_password(data['password_first'])
     except ValidationError:
         return JsonResponse({
             'ok': False, 'message': 'Пароль является слабым'
@@ -161,7 +166,9 @@ def confirm_new_password(request):
             'ok': False, 'message': 'Подтверждение не совпадает с паролем'
         })
 
-    user = confirm.check_email_token(data['murren_code'], settings.EMAIL_TOKEN_LIFETIME)
+    user = confirm.check_email_token(data['email_token'], 
+                                     'reset-password', 
+                                     settings.EMAIL_TOKEN_LIFETIME)
 
     if not user['error']:
         if auth.reset_password(data['password_second'], user['user']):

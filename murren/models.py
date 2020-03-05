@@ -32,7 +32,9 @@ class Murren(AbstractUser):
 class EmailToken(models.Model):
     murren = models.ForeignKey(Murren, on_delete=models.CASCADE)
     token = models.CharField(max_length=128)
-    time = models.DateTimeField(auto_now_add=True)
+    password = models.CharField(max_length=128, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    target = models.CharField(max_length=64)
 
     class Meta:
         verbose_name = ("email_token")
