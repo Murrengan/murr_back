@@ -24,7 +24,7 @@ def generate_email_token(user, target, password=False):
     salt = crypt.mksalt(crypt.METHOD_SHA512)
     token = hmac.new(key.encode(), salt.encode(), hashlib.sha256).hexdigest()
 
-    if password:
+    if password is False:
         EmailToken.objects.create(token=token, murren=user, target=target)
     else:
         EmailToken.objects.create(token=token, murren=user, target=target, password=password)
