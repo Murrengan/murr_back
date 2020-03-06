@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
@@ -123,7 +124,7 @@ def reset_password(request):
             'ok': False, 'message': 'Такой почты нет в системе'
         })
 
-    token = confirm.generate_email_token(user, 'reset-password', user.password)
+    token = confirm.generate_email_token(user, 'reset-password')
     url = confirm.generate_confirm_url('set_new_password', token)
     confirm_result = confirm.send_confirm('activation_email.html', 
                                           '[murrengan] Восстановление пароля Муррена',
@@ -152,6 +153,11 @@ def confirm_new_password(request):
     if 'password_first' not in data or not data['password_first']:
         return JsonResponse({
             'ok': False, 'message': 'Вы не указали пароль'
+        })
+    
+    if 'password_second' not in data or not data['password_second']:
+        return JsonResponse({
+            'ok': False, 'message': 'Вы не указали второй пароль'
         })
 
     try:

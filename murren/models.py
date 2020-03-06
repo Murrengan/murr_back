@@ -31,8 +31,7 @@ class Murren(AbstractUser):
 
 class EmailToken(models.Model):
     murren = models.ForeignKey(Murren, on_delete=models.CASCADE)
-    token = models.CharField(max_length=128)
-    password = models.CharField(max_length=128, null=True, blank=True)
+    token = models.CharField(max_length=64)
     created_at = models.DateTimeField(auto_now_add=True)
     target = models.CharField(max_length=64)
 

@@ -19,26 +19,23 @@ from murren.models import EmailToken
 User = get_user_model()
 
 
-def generate_email_token(user, target, password=False):
+def generate_email_token(user, target):
     key = str(uuid4())
     salt = crypt.mksalt(crypt.METHOD_SHA512)
     token = hmac.new(key.encode(), salt.encode(), hashlib.sha256).hexdigest()
 
-    if password:
-        EmailToken.objects.create(token=token, murren=user, target=target)
-    else:
-        EmailToken.objects.create(token=token, murren=user, target=target, password=password)
+    EmailToken.objects.create(token=token, murren=user, target=target)
 
     return token
 
 
 def check_email_token(token, target, lifetime):
-    token = force_text(urlsafe_base64_decode(token))
-
     try:
+        token = force_text(urlsafe_base64_decode(token))
+
         token = EmailToken.objects.get(token=token, target=target)
         user = token.murren
-    except EmailToken.DoesNotExist:
+    except (EmailToken.DoesNotExist, UnicodeDecodeError):
         return {'error': True,  'type': 'email_token'}
 
     created_at = int(format(token.created_at, 'U'))
