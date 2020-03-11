@@ -1,7 +1,6 @@
 import json
 
 import requests
-from django.http import JsonResponse
 
 recaptcha_server_token = '6LfLNNcUAAAAAC_GSWQztiI2NVqnJbicZI53SCE9'
 

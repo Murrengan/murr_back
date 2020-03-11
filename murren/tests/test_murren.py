@@ -5,10 +5,6 @@ from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import modify_settings
 from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-
-from murren.forms import MurrenSignupForm
 
 Murren = get_user_model()
 
@@ -25,13 +21,16 @@ def test_create_murren(api_client, yml_dataset, test_password, test_email, test_
         'email': email,
     }
 
-    url = reverse('murren_register')
+    url = yml_dataset['test_create_murren']['url_for_create_murren']
     response = api_client.post(url, data, format='json')
 
-    assert response.status_code == 200
-    assert json.loads(response.content) == yml_dataset['test_create_murren']['response_on_sign_up']
+    assert response.status_code == 201
+    assert data['username'] in json.loads(response.content).values()
+    assert data['email'] in json.loads(response.content).values()
+    assert 'id' in json.loads(response.content).keys()
     assert len(Murren.objects.all()) == 1
     assert len(mail.outbox) == 1
+
     murren = Murren.objects.get(pk=1)
     assert murren.username == username
     assert murren.password is not None
@@ -40,15 +39,16 @@ def test_create_murren(api_client, yml_dataset, test_password, test_email, test_
     html_mail_body = mail.outbox[0].alternatives[0][0]
     assert username in html_mail_body
 
-    activation_code = urlsafe_base64_encode(force_bytes(murren.email))
-    assert activation_code in html_mail_body
+    raw_list = html_mail_body.split('___')
+    uid, token = raw_list[1], raw_list[2]
 
-    url = reverse('murren_activate')
+    url = yml_dataset['test_create_murren']['url_for_activation_murren']
     data = {
-        'murren_email': activation_code,
+        'uid': uid,
+        'token': token,
     }
     response = api_client.post(url, data, format='json')
-    assert json.loads(response.content) == yml_dataset['test_create_murren']['response_on_activation']
+    assert response.status_code == 204
     murren = Murren.objects.get(pk=1)
     assert murren.is_active is True
 
@@ -68,39 +68,3 @@ def test_create_murren(api_client, yml_dataset, test_password, test_email, test_
     response = api_client.get(url)
     assert response.status_code == 200
     assert response.data == yml_dataset['test_create_murren']['auth_response']
-
-
-@pytest.mark.django_db
-def test_short_password(yml_dataset, test_murren_name, test_email):
-    data = {
-        'username': test_murren_name,
-        'email': test_email,
-        'password': yml_dataset['test_short_password']['week_password']
-    }
-    form = MurrenSignupForm(data)
-    assert form.is_valid() is False
-    assert yml_dataset['test_short_password']['error_text'] in form.errors.get('password')
-
-
-@pytest.mark.django_db
-def test_common_password(yml_dataset, test_murren_name, test_email):
-    data = {
-        'username': test_murren_name,
-        'email': test_email,
-        'password': yml_dataset['test_common_password']['week_password']
-    }
-    form = MurrenSignupForm(data)
-    assert form.is_valid() is False
-    assert yml_dataset['test_common_password']['error_text'] in form.errors.get('password')
-
-
-@pytest.mark.django_db
-def test_numeric_password(yml_dataset, test_murren_name, test_email):
-    data = {
-        'username': test_murren_name,
-        'email': test_email,
-        'password': yml_dataset['test_numeric_password']['week_password']
-    }
-    form = MurrenSignupForm(data)
-    assert form.is_valid() is False
-    assert yml_dataset['test_numeric_password']['error_text'] in form.errors.get('password')
