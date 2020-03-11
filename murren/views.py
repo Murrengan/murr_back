@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
 
@@ -33,9 +35,7 @@ class PublicMurrenInfo(APIView):
         return Response(serializer.data)
 
 
-class GetAllMurrens(APIView):
-
-    def get(self, request):
-        qs = Murren.objects.filter(is_active=True)
-        serializer = MurrenSerializers(qs, many=True)
-        return Response(serializer.data)
+class GetAllMurrens(ListAPIView):
+    queryset = Murren.objects.filter(is_active=True).order_by('-date_joined')
+    serializer_class = MurrenSerializers
+    pagination_class = PageNumberPagination
