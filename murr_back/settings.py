@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     # 3rd party
     'rest_framework',
     'corsheaders',
+    'djoser',
 
     # if we want to add refresh token to blacklist
     # 'rest_framework_simplejwt.token_blacklist',
@@ -64,6 +65,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'murr_back.wsgi.application'
+
+BASE_URL = 'http://127.0.0.1:8080'
+# BASE_URL = 'https://murrengan.ru'
 
 DATABASES = {
     'default': {
@@ -127,9 +131,6 @@ CORS_ORIGIN_WHITELIST = [
 
     "http://localhost:8080",
     "http://127.0.0.1:8080",
-
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
     "http://35.230.139.201",
     "http://www.murrengan.ru",
 ]
@@ -163,8 +164,18 @@ SIMPLE_JWT = {
 }
 
 RECAPTCHA_URL_PROTECTED = (
-    r'^murren/token_create/$',
-    r'^murren/register/$',
-    r'^murren/reset_password/$',
-    r'^murren/confirm_new_password/$',
+    'auth/users/reset_password_confirm/',
+    'auth/users/',
+    'auth/users/reset_password/',
+    'murren/token_create/',
 )
+
+DJOSER = {
+    'ACTIVATION_URL': 'murren_email_activate/?murr_code=___{uid}___{token}___',
+    'PASSWORD_RESET_CONFIRM_URL': 'set_new_password/?murr_code=___{uid}___{token}___',
+    'SEND_ACTIVATION_EMAIL': True,
+    'EMAIL': {
+        'activation': 'murren.email.MurrenActivationEmail',
+        'password_reset': 'murren.email.MurrenPasswordResetEmail',
+    }
+}
