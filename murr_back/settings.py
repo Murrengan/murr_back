@@ -66,25 +66,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'murr_back.wsgi.application'
 
-BASE_URL = 'http://127.0.0.1:8080'
-# BASE_URL = 'https://murrengan.ru'
+# BASE_URL = 'http://127.0.0.1:8080'
+BASE_URL = 'https://murrengan.ru'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'murr_bd',
-#         'USER': 'murr',
-#         'PASSWORD': 'murr_password',
-#         'HOST': '127.0.0.1',
-#         'PORT': 5432,
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'murr_bd',
+        'USER': 'murr',
+        'PASSWORD': 'murr_password',
+        'HOST': '127.0.0.1',
+        'PORT': 5432,
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -135,14 +135,14 @@ CORS_ORIGIN_WHITELIST = [
     "http://www.murrengan.ru",
 ]
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'murrengan.test@gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_PASSWORD = 'iufotejcfyojsgby'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'murrengan.test@gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = 'iufotejcfyojsgby'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
