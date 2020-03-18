@@ -3,7 +3,7 @@ import json
 import requests
 
 recaptcha_server_token = '6Lesdd8UAAAAAJ4uDqjsX85z-81w87DDYsnwZjDd'
-base_url = 'http://murrengan.ru'
+
 
 def check_recaptcha(token):
     recaptcha = {
@@ -17,4 +17,3 @@ def check_recaptcha(token):
     if recaptcha_response_text['success'] is False:
         return {'recaptcha_response_problem': True, 'recaptcha_response_text': recaptcha_response_text}
     return {'recaptcha_response_problem': False}
-

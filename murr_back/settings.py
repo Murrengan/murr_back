@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     # 3rd party
     'rest_framework',
     'corsheaders',
+    'djoser',
 
     # if we want to add refresh token to blacklist
     # 'rest_framework_simplejwt.token_blacklist',
@@ -41,6 +42,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'murr_back.middleware.CheckRecaptchaMiddleware',
 ]
 
 ROOT_URLCONF = 'murr_back.urls'
@@ -62,6 +65,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'murr_back.wsgi.application'
+
+# BASE_URL = 'http://127.0.0.1:8080'
+BASE_URL = 'https://murrengan.ru'
 
 # DATABASES = {
 #     'default': {
@@ -86,6 +92,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 6,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -122,9 +131,6 @@ CORS_ORIGIN_WHITELIST = [
 
     "http://localhost:8080",
     "http://127.0.0.1:8080",
-
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
     "http://35.230.139.201",
     "http://www.murrengan.ru",
 ]
@@ -139,11 +145,11 @@ EMAIL_HOST_PASSWORD = 'iufotejcfyojsgby'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 REST_FRAMEWORK = {
-
     'DEFAULT_AUTHENTICATION_CLASSES': (
-
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 30
 }
 
 SIMPLE_JWT = {
@@ -155,4 +161,21 @@ SIMPLE_JWT = {
     # when we want to add refresh token to blacklist, uncomment this field and make migrations.
     # with this have some problem to remove murren form db
     # 'BLACKLIST_AFTER_ROTATION': True,
+}
+
+RECAPTCHA_URL_PROTECTED = (
+    'auth/users/reset_password_confirm/',
+    'auth/users/',
+    'auth/users/reset_password/',
+    'murren/token_create/',
+)
+
+DJOSER = {
+    'ACTIVATION_URL': 'murren_email_activate/?murr_code=___{uid}___{token}___',
+    'PASSWORD_RESET_CONFIRM_URL': 'set_new_password/?murr_code=___{uid}___{token}___',
+    'SEND_ACTIVATION_EMAIL': True,
+    'EMAIL': {
+        'activation': 'murren.email.MurrenActivationEmail',
+        'password_reset': 'murren.email.MurrenPasswordResetEmail',
+    }
 }
