@@ -131,8 +131,8 @@ CORS_ORIGIN_WHITELIST = [
 
     "http://localhost:8080",
     "http://127.0.0.1:8080",
-    "http://35.230.139.201",
-    "http://www.murrengan.ru",
+    "https://35.230.139.201",
+    "https://www.murrengan.ru",
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
