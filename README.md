@@ -9,8 +9,8 @@
 
 <ul>
     <li>Регистрация клиента на сайте (доступно с версии 0.0.12b)</li>
-    <li>Получение информации от клиента (в разработке)</li>
-    <li>Чат (в планах)</li>
+    <li>Получение информации от клиента (доступно с версии 0.0.13)</li>
+    <li>Чат (в разработке)</li>
     <li>Корзина товаров и оплата (в планах)</li>
 </ul>
 
@@ -33,7 +33,7 @@ pip install -r requirements.txt
 ```
 ### Подготовка базы данных
 ```
-python manage.py makemigrations murren
+python manage.py makemigrations murren murr_card
 python manage.py migrate
 ```
 

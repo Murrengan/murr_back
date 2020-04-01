@@ -11,7 +11,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
 
     # local
-    path('murren/', include('murren.urls')),
-    path('murr_card/', include('murr_card.urls')),
+    path('api/murren/', include('murren.urls')),
+    path('api/murr_card/', include('murr_card.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
