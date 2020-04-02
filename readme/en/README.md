@@ -8,8 +8,8 @@
 
 <ul>
     <li>user registration (0.0.12b)</li>
-    <li>getting information from client (in dev)</li>
-    <li>chat application (in plan)</li>
+    <li>getting information from client (0.0.13)</li>
+    <li>chat application (in dev)</li>
     <li>cart and payments (in plan)</li>
 </ul>
 
@@ -32,7 +32,7 @@ pip install -r requirements.txt
 ```
 ### Migrations
 ```
-python manage.py makemigrations murren
+python manage.py makemigrations murren murr_card
 python manage.py migrate
 ```
 
