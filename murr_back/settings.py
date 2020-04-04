@@ -168,7 +168,8 @@ RECAPTCHA_URL_PROTECTED = (
     'auth/users/reset_password_confirm/',
     'auth/users/',
     'auth/users/reset_password/',
-    'murren/token_create/',
+    'api/murren/token_create/',
+    'api/murr_card/'
 )
 
 DJOSER = {
