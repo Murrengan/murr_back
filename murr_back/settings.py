@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'djoser',
+    'channels',
 
     # if we want to add refresh token to blacklist
     # 'rest_framework_simplejwt.token_blacklist',
@@ -28,6 +29,7 @@ INSTALLED_APPS = [
     # local
     'murren.apps.MurrenConfig',
     'murr_card.apps.MurrCardConfig',
+    'murr_chat.apps.MurrChatConfig',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +67,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'murr_back.wsgi.application'
+ASGI_APPLICATION = 'murr_back.routing.application'
 
 BASE_URL = os.environ.get("BASE_URL", 'http://127.0.0.1:8080')
 LOCALHOST = os.environ.get("LOCALHOST", 'http://127.0.0.1:8000')
@@ -172,4 +175,13 @@ DJOSER = {
         'activation': 'murren.email.MurrenActivationEmail',
         'password_reset': 'murren.email.MurrenPasswordResetEmail',
     }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }

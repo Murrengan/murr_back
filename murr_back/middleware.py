@@ -1,11 +1,19 @@
 import json
+from urllib.parse import parse_qs
 
+from channels.db import database_sync_to_async
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db import close_old_connections
 from django.http import JsonResponse
+from jwt import decode as jwt_decode
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.tokens import UntypedToken
 
 from common_helpers.recaptcha import check_recaptcha
 
 URL_PROTECTED = settings.RECAPTCHA_URL_PROTECTED
+Murren = get_user_model()
 
 
 class CheckRecaptchaMiddleware:
@@ -33,3 +41,24 @@ class CheckRecaptchaMiddleware:
                     status=400)
 
         return self.get_response(request)
+
+
+class SocketTokenAuthMiddleware:
+
+    def __init__(self, inner):
+        self.inner = inner
+
+    def __call__(self, scope):
+        database_sync_to_async(close_old_connections)()
+        token = parse_qs(scope["query_string"].decode("utf8"))["token"][0]
+
+        try:
+            UntypedToken(token)
+        except (InvalidToken, TokenError):
+            return None
+        else:
+            decoded_data = jwt_decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+
+            pk = decoded_data["user_id"]
+
+        return self.inner(dict(scope, user=pk))
