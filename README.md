@@ -2,6 +2,8 @@
 <img src="readme/img/thumbnail.png" align="center" title="Murrengan network"/>
 </p>
 
+<src href="https://github.com/Murrengan/murr_back/workflows/Python%20application/badge.svg">
+
 <a href="readme/en"><img src="readme/img/united_states_of_america_usa.png" align="right" height="25" width="30" title="English"></a>
 <br/>
 
