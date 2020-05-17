@@ -27,3 +27,12 @@ class Murren(AbstractUser):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.murren_avatar.path)
+
+
+class SignUpTokens(models.Model):
+
+    uuid = models.CharField(max_length=6)
+    owner = models.ForeignKey(Murren, on_delete=models.CASCADE, related_name='sign_up_tokens')
+
+    def __str__(self):
+        return self.uuid
