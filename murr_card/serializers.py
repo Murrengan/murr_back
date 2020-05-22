@@ -23,3 +23,10 @@ class AllMurrSerializer(serializers.ModelSerializer):
     class Meta:
         model = MurrCard
         fields = ('owner_name', 'title', 'cover', 'id')
+
+
+class AllMurrShortSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MurrCard
+        fields = ('title', 'cover', 'id')

@@ -11,7 +11,9 @@ from rest_framework.views import APIView
 
 from murr_back.settings import LOCALHOST
 from .models import MurrCard
-from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
+from .serializers import (MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer,
+                          AllMurrShortSerializer,
+                          )
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +75,18 @@ class MurrPagination(PageNumberPagination):
 
 
 class AllMurr(ListAPIView):
-    queryset = MurrCard.objects.all().order_by('-timestamp')
-    serializer_class = AllMurrSerializer
     pagination_class = MurrPagination
+
+    def get_serializer_class(self):
+        murren_id = self.request.query_params.get('murren_id')
+        if murren_id:
+            return AllMurrShortSerializer
+        return AllMurrSerializer
+
+    def get_queryset(self):
+        murren_id = self.request.query_params.get('murren_id')
+        queryset = MurrCard.objects.all().order_by('-timestamp')
+        if murren_id:
+            queryset = queryset.filter(owner_id=murren_id)
+            return queryset
+        return queryset
