@@ -11,6 +11,7 @@ services:
     expose:
       - 8000
     volumes:
+      - static_volume:/home/murrengan/staticfiles
       - ./media:/home/murrengan/media
   db:
     image: postgres:11
