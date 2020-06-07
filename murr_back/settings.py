@@ -67,7 +67,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'murr_back.wsgi.application'
 
 BASE_URL = os.environ.get("BASE_URL", 'http://127.0.0.1:8080')
-LOCALHOST = os.environ.get("LOCALHOST", 'http://127.0.0.1')
+LOCALHOST = os.environ.get("LOCALHOST", 'http://127.0.0.1:8000')
 
 DATABASES = {
     "default": {
