@@ -23,15 +23,14 @@ class MurrCard(models.Model):
             img = Image.open(self.cover.path)
 
             if img.mode in ('RGBA', 'LA'):
-                fill_color = '#A36FFF'
+                fill_color = '#C3A1FF'
                 background = Image.new(img.mode[:-1], img.size, fill_color)
                 background.paste(img, img.split()[-1])
                 img = background
-
-            if img.height > 500 or img.width > 500:
-                output_size = (500, 500)
+            if img.height > 320 or img.width > 320:
+                output_size = (320, 320)
                 img.thumbnail(output_size)
-                img.save(self.cover.path)
+                img.save(self.cover.path, 'webp')
 
 
 class EditorImageForMurrCard(models.Model):
@@ -46,4 +45,4 @@ class EditorImageForMurrCard(models.Model):
         if img.height > 500 or img.width > 500:
             output_size = (500, 500)
             img.thumbnail(output_size)
-            img.save(self.murr_editor_image.path)
+            img.save(self.murr_editor_image.path, 'webp')
