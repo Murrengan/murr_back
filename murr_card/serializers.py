@@ -1,14 +1,23 @@
 from rest_framework import serializers
 
-from .models import MurrCard, EditorImageForMurrCard
+from .models import MurrCard, EditorImageForMurrCard, Comment
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    owner_name = serializers.ReadOnlyField(source='owner.username')
+
+    class Meta:
+        model = Comment
+        fields = ('owner', 'murr_card', 'text', 'owner_name')
 
 
 class MurrCardSerializers(serializers.ModelSerializer):
     owner_name = serializers.ReadOnlyField(source='owner.username')
+    comments = CommentSerializer(many=True)
 
     class Meta:
         model = MurrCard
-        fields = ('owner', 'title', 'cover', 'content', 'id', 'owner_name')
+        fields = ('owner', 'title', 'cover', 'content', 'id', 'owner_name', 'comments')
 
 
 class EditorImageForMurrCardSerializers(serializers.ModelSerializer):
