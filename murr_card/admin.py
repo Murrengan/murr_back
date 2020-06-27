@@ -1,5 +1,4 @@
 from django.contrib import admin
-from .models import MurrCard, Comment
+from .models import MurrCard
 
 admin.site.register(MurrCard)
-admin.site.register(Comment)

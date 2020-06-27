@@ -1,5 +1,9 @@
 from django.db import models
 
+from murr_card.models import MurrCard
+from murren.models import Murren
+
+
 class Comment(models.Model):
     """ Модель комментнария для murr_card """
     murr_card = models.ForeignKey(MurrCard, on_delete=models.CASCADE, related_name='comments', verbose_name='murr_card')
