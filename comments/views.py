@@ -9,7 +9,6 @@ from comments.serializers import CommentSerializer
 class CommentView(APIView):
 
     def get(self, request):
-        print(Comment.objects.all())
         comments = Comment.objects.filter(id=request.query_params['comment_id'])
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
