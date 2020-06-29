@@ -31,22 +31,28 @@
 ```
 pip install -r requirements.txt
 ```
-### Подготовка базы данных
+##### Подготовка базы данных
 ```
-python manage.py makemigrations murren murr_card
 python manage.py migrate
 ```
 
-### Запуск сервера
+##### Запуск сервера
 ```
 python manage.py runserver
 ```
 
-### Запуск тестов
+##### Запуск тестов
 ```
 pytest
 ```
 
+### Установка на прод через Docker
+```
+Сделать файл entrypoint.sh исполняемым (sudo chmod +x entrypoint.sh)
+Запустить sudo docker-compose up --build (-d для детач режима)
+Для https получить origin_ca_rsa_root.pem и private_origin_ca_ecc_root.pem сертификаты у cloudflare.com и разместить их в ./nginx
+
+```
 <br/>
 
 <h2 align="center">Скачивай, тренируйся и принимай участие в улучшении функционала!❤</h2>
