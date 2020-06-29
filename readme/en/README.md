@@ -30,20 +30,26 @@
 ```
 pip install -r requirements.txt
 ```
-### Migrations
+##### Migrations
 ```
-python manage.py makemigrations murren murr_card
 python manage.py migrate
 ```
 
-### Run for development
+##### Run for development
 ```
 python manage.py runserver
 ```
 
-### Run tests
+##### Run tests
 ```
 pytest
+```
+
+### Run on prod via Docker
+```
+Make a file entrypoint.sh executable (sudo chmod +x entrypoint.sh)
+Run sudo docker-compose up --build (-d for detach mode)
+For https, get origin_ca_rsa_root.pem and private_origin_ca_ecc_root.pem certificates from cloudflare.com and place them in . / nginx
 ```
 
 <br/>
