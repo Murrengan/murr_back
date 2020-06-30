@@ -4,19 +4,33 @@ from rest_framework.views import APIView
 
 from comments.models import Comment
 from comments.serializers import CommentSerializer
+from murr_card.models import MurrCard
 
 
 class CommentView(APIView):
 
     def get(self, request):
-        comments = Comment.objects.filter(id=request.query_params['comment_id'])
+        murr_card = MurrCard.objects.get(pk=request.query_params['murr_id'])
+        comments = Comment.objects.filter(murr_card=murr_card)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
     def post(self, request):
+        """
+        В запросе должен быть json вида
+        {
+            murr_card: ...,
+            owner: ...,
+            text: ...,
+            parent: ...,
+        }
+
+        """
         serializer = CommentSerializer(data=request.data)
 
         if serializer.is_valid():
+            parent_comment = serializer.validated_data.get('parent')
+            serializer.validated_data['depth'] = parent_comment.depth + 1
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
