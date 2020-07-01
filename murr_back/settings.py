@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     # local
     'murren.apps.MurrenConfig',
     'murr_card.apps.MurrCardConfig',
-    'comments.apps.CommentsConfig'
 ]
 
 MIDDLEWARE = [
