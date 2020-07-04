@@ -12,6 +12,8 @@ from rest_framework.views import APIView
 from murr_back.settings import LOCALHOST
 from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
+from django_filters import rest_framework as rest_filter
+from rest_framework import filters
 
 logger = logging.getLogger(__name__)
 
@@ -76,3 +78,11 @@ class AllMurr(ListAPIView):
     queryset = MurrCard.objects.all().order_by('-timestamp')
     serializer_class = AllMurrSerializer
     pagination_class = MurrPagination
+
+
+class Search(ListAPIView):
+    queryset = MurrCard.objects.all()
+    serializer_class = AllMurrSerializer
+    pagination_class = MurrPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title']

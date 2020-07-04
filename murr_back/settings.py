@@ -21,7 +21,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'djoser',
-
     # if we want to add refresh token to blacklist
     # 'rest_framework_simplejwt.token_blacklist',
 
