@@ -3,6 +3,7 @@ import logging
 
 from django.core.files.base import ContentFile
 from django.utils.crypto import get_random_string
+from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -46,6 +47,16 @@ class MurrCardView(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+    def delete(self, request):
+        murr = MurrCard.objects.get(id=request.data['murr_id'])
+        author = request.data['owner_id']
+        login_user = request.user.id
+        if author == login_user:
+            murr.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class EditorImageForMurrCardView(APIView):
