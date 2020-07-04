@@ -1,4 +1,3 @@
-
 import pytest
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -16,6 +15,7 @@ def test_delete_murr_valid_params(create_murren, create_murr):
     delete_path = reverse('MurrCardView')
     user_request = client.delete(delete_path, data={'murr_id': murr1, 'owner_id': 1}, format='json')
     assert user_request.status_code == 204
+
 
 @pytest.mark.django_db
 def test_delete_murr_invalid_params(create_murren, create_murr):

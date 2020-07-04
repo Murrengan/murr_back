@@ -1,8 +1,6 @@
-
 import pytest
 from django.contrib.auth import get_user_model
 from murr_card.models import MurrCard
-
 
 Murren = get_user_model()
 
@@ -14,7 +12,6 @@ def create_murren():
                                        email='integritys@mail.com')
     user1.save()
     return user1
-
 
 
 @pytest.fixture

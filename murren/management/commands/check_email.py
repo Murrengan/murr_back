@@ -11,9 +11,8 @@ class Command(BaseCommand):
         now = datetime.now(timezone.utc)
 
         for user in users:
-            if user.is_active != True:
+            if not user.is_active:
                 if now - user.date_joined > timedelta(2):
                     user.delete()
-            if user.is_active == True:
-                    user.email_check = 1
-
+            if user.is_active:
+                user.email_check = 1

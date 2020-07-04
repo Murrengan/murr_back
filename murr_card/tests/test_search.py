@@ -6,7 +6,7 @@ from rest_framework.test import APIRequestFactory, APIClient
 
 
 @pytest.mark.django_db
-def test_search_murr_valid_params(create_murren, create_murr1):
+def test_search_murr_valid_params(create_murren, create_murr):
     c = APIClient()
     search_path = reverse('search_murr')
     user_request = c.get(search_path, data={'search': '1'})
@@ -16,7 +16,7 @@ def test_search_murr_valid_params(create_murren, create_murr1):
 
 
 @pytest.mark.django_db
-def test_search_murr_invalid_params(create_murren, create_murr1):
+def test_search_murr_invalid_params(create_murren, create_murr):
     c = APIClient()
     search_path = reverse('search_murr')
     user_request = c.get(search_path, data={'search': '3'})
