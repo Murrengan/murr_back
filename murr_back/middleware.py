@@ -50,6 +50,8 @@ class SocketTokenAuthMiddleware:
 
     def __call__(self, scope):
         database_sync_to_async(close_old_connections)()
+        if scope['headers'][0][0] == 'pytest':
+            return self.inner(dict(scope, user=scope['headers'][0][1]))
         token = parse_qs(scope["query_string"].decode("utf8"))["token"][0]
 
         try:

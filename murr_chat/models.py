@@ -10,9 +10,17 @@ class MurrChat(models.Model):
     def __str__(self):
         return self.murr_chat_name
 
+    @classmethod
+    def chat_name(cls, group_id):
+        return f'{group_id}'
+
+    @classmethod
+    def personal_murren_channel(cls, murren_id):
+        return f'{murren_id}'
+
     @property
     def link(self):
-        return f'/ws/murr_chat/{self.murr_chat_name}/'
+        return f'/ws/murr_chat/{self.id}/'
 
 
 class MurrChatMembers(models.Model):

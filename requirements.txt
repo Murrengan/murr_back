@@ -39,8 +39,9 @@ PyHamcrest==2.0.2
 PyJWT==1.7.1
 pyOpenSSL==19.1.0
 pyparsing==2.4.6
-pytest==5.3.5
-pytest-django==3.8.0
+pytest==5.4.3
+pytest-asyncio==0.14.0
+pytest-django==3.9.0
 pytz==2019.3
 PyYAML==5.3
 requests==2.23.0

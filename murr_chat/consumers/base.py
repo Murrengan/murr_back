@@ -36,17 +36,17 @@ class BaseMurrChatConsumer(AsyncJsonWebsocketConsumer):
             return content
 
     async def _group_send(self, data, event=None):
-        data = {'type': 'proxy.group.send', 'data': data, 'event': event}
-        await self.channel_layer.group_send(self.murr_chat_name, data)
+        data = {'type': 'proxy.group.send', 'data': data, 'gan': event}
+        await self.channel_layer.group_send(self.chat_name, data)
 
     async def proxy_group_send(self, event):
-        await self._send_message(event['data'], event=event.get('event'))
+        await self._send_message(event['data'], event=event.get('gan'))
 
     async def method_undefined(self, message):
         await self._trow_error({'detail': 'Unknown event'}, event=message['event'])
 
     async def _send_message(self, data, event=None):
-        await self.send_json(content={'status': 'ok', 'data': data, 'event': event})
+        await self.send_json(content={'status': 'ok', 'data': data, 'gan': event})
 
     async def _trow_error(self, data, event=None):
-        await self.send_json(content={'status': 'error', 'data': data, 'event': event})
+        await self.send_json(content={'status': 'error', 'data': data, 'gan': event})
