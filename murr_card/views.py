@@ -9,6 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Q
 
 from murr_back.settings import LOCALHOST
 from .models import MurrCard
@@ -22,7 +23,13 @@ class MurrCardView(APIView):
 
     def get(self, request):
 
-        qs = MurrCard.objects.filter(id=request.query_params['murr_id'])
+        if 'murr_id' in request.query_params:
+            qs = MurrCard.objects.filter(id=request.query_params['murr_id'])
+        elif 'search' in request.query_params:
+            search_param = request.query_params.get('search').lower()
+            qs = MurrCard.objects.filter(Q(content__icontains=search_param) | Q(title__icontains=search_param))
+        else:
+            qs = MurrCard.objects.all()
         serializer = MurrCardSerializers(qs, many=True)
         return Response(serializer.data)
 
