@@ -15,6 +15,11 @@ class MurrCard(models.Model):
     def __str__(self):
         return self.title
 
+    def delete(self, *args, **kwargs):
+        if self.cover:
+            self.cover.delete()
+        super().delete(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
