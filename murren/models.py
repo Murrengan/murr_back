@@ -1,6 +1,7 @@
 from PIL import Image
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 
 
 class Murren(AbstractUser):
@@ -11,6 +12,11 @@ class Murren(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def murren_url(self):
+        base_url = settings.BASE_URL
+        return f'{base_url}/murren/{self.pk}'
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
