@@ -3,11 +3,11 @@ from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = '+ownf%0op*r)rytn0^u38y7sbp_w6nf-uf9cbtm0sk2o#b1^bj'
+SECRET_KEY = os.environ.get("SECRET_KEY", '+ownf%0op*r)rytn0^u38y7sbp_w6nf-uf9cbtm0sk2o#b1^bj')
 
-DEBUG = True
+DEBUG = int(os.environ.get("DEBUG", default=1))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", '*').split(" ")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'djoser',
+    'channels',
 
     # if we want to add refresh token to blacklist
     # 'rest_framework_simplejwt.token_blacklist',
@@ -28,6 +29,7 @@ INSTALLED_APPS = [
     # local
     'murren.apps.MurrenConfig',
     'murr_card.apps.MurrCardConfig',
+    'murr_chat.apps.MurrChatConfig',
 ]
 
 MIDDLEWARE = [
@@ -65,27 +67,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'murr_back.wsgi.application'
+ASGI_APPLICATION = 'murr_back.routing.application'
 
-BASE_URL = 'http://127.0.0.1:8080'
-# BASE_URL = 'https://murrengan.ru'
-LOCALHOST = 'http://127.0.0.1:8000'
+BASE_URL = os.environ.get("BASE_URL", 'http://127.0.0.1:8080')
+LOCALHOST = os.environ.get("LOCALHOST", 'http://127.0.0.1:8000')
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", 'django.db.backends.sqlite3'),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, 'db.sqlite3')),
+        "USER": os.environ.get("SQL_USER"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD"),
+        "HOST": os.environ.get("SQL_HOST"),
+        "PORT": os.environ.get("SQL_PORT"),
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'murr_bd',
-#         'USER': 'murr',
-#         'PASSWORD': 'murr_password',
-#         'HOST': '127.0.0.1',
-#         'PORT': 5432,
-#     }
-# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -131,19 +127,19 @@ AUTH_USER_MODEL = 'murren.Murren'
 CORS_ORIGIN_WHITELIST = [
 
     "http://localhost:8080",
+    "http://localhost:8000",
     "http://127.0.0.1:8080",
-    "http://35.230.139.201",
+    "http://127.0.0.1:8000",
     "http://www.murrengan.ru",
+    "https://www.murrengan.ru",
 ]
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'murrengan.test@gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_PASSWORD = 'iufotejcfyojsgby'
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", 'django.core.mail.backends.console.EmailBackend')
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS")
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -163,6 +159,7 @@ SIMPLE_JWT = {
     # with this have some problem to remove murren form db
     # 'BLACKLIST_AFTER_ROTATION': True,
 }
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 RECAPTCHA_URL_PROTECTED = (
     'auth/users/reset_password_confirm/',
@@ -181,3 +178,14 @@ DJOSER = {
         'password_reset': 'murren.email.MurrenPasswordResetEmail',
     }
 }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"

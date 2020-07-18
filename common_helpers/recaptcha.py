@@ -2,7 +2,7 @@ import json
 
 import requests
 
-recaptcha_server_token = '6Lesdd8UAAAAAJ4uDqjsX85z-81w87DDYsnwZjDd'
+recaptcha_server_token = '6Lc0qP4UAAAAAHOoKTRWpWhfoIXSoAUh0HDaAaB4'
 
 
 def check_recaptcha(token):
