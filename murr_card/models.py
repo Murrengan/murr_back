@@ -35,7 +35,7 @@ class MurrCard(models.Model):
             if img.height > 320 or img.width > 320:
                 output_size = (320, 320)
                 img.thumbnail(output_size)
-                img.save(self.cover.path, 'webp')
+                img.save(self.cover.path, 'jpeg')
 
 
 class EditorImageForMurrCard(models.Model):
@@ -50,4 +50,4 @@ class EditorImageForMurrCard(models.Model):
         if img.height > 500 or img.width > 500:
             output_size = (500, 500)
             img.thumbnail(output_size)
-            img.save(self.murr_editor_image.path, 'webp')
+            img.save(self.murr_editor_image.path, 'jpeg')
