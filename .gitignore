@@ -3,6 +3,7 @@ __pycache__/
 db.sqlite3
 media/*
 venv/
+.env/
 !media/default_murren_avatar.png
 !media/tanochka.jpg
 staticfiles/
