@@ -16,7 +16,7 @@ class Murren(AbstractUser):
     @property
     def murren_url(self):
         base_url = settings.BASE_URL
-        return f'{base_url}/murren/{self.pk}'
+        return f'{base_url}/m/{self.username}'
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
