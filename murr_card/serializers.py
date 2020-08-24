@@ -17,11 +17,3 @@ class EditorImageForMurrCardSerializers(serializers.ModelSerializer):
     class Meta:
         model = EditorImageForMurrCard
         fields = ('murr_editor_image',)
-
-
-class AllMurrSerializer(serializers.ModelSerializer):
-    owner_name = serializers.ReadOnlyField(source='owner.username')
-
-    class Meta:
-        model = MurrCard
-        fields = ('owner_name', 'title', 'cover', 'id')
