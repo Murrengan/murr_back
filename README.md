@@ -51,8 +51,14 @@ pytest
 Сделать файл entrypoint.sh исполняемым (sudo chmod +x entrypoint.sh)
 Запустить sudo docker-compose up --build (-d для детач режима)
 Для https получить origin_ca_rsa_root.pem и private_origin_ca_ecc_root.pem сертификаты у cloudflare.com и разместить их в ./nginx
-
 ```
+
+### Установка на dev через Docker
+```
+Сделать файл entrypoint.sh исполняемым (sudo chmod +x entrypoint.sh)
+Запустить docker-compose -f docker-compose-dev.yml up --build (-d для детач режима)
+```
+
 <br/>
 
 <h2 align="center">Скачивай, тренируйся и принимай участие в улучшении функционала!❤</h2>

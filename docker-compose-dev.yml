@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  django:
+    build: .
+    command: gunicorn murr_back.wsgi:application --bind 0.0.0.0:7391
+    depends_on:
+      - db
+    expose:
+      - 7391
+    volumes:
+      - static_volume:/home/murrengan/staticfiles
+      - ./media:/home/murrengan/media
+  db:
+    image: postgres:11
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=murr_postgres_user
+      - POSTGRES_PASSWORD=murr_postgres_password
+      - POSTGRES_DB=murr_postgres_bd
+  nginx:
+    image: nginx:mainline-alpine
+    ports:
+      - 8000:8000
+      - 80:8000
+    volumes:
+      - static_volume:/home/murrengan/staticfiles
+      - ./media:/home/murrengan/media
+      - ./dist:/home/murrengan/murr_front/dist
+      - ./nginx/dev:/etc/nginx/conf.d
+    depends_on:
+      - django
+volumes:
+  postgres_data:
+  static_volume:
+  media:
+  dist:

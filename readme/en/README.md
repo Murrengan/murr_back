@@ -51,6 +51,11 @@ Make a file entrypoint.sh executable (sudo chmod +x entrypoint.sh)
 Run sudo docker-compose up --build (-d for detach mode)
 For https, get origin_ca_rsa_root.pem and private_origin_ca_ecc_root.pem certificates from cloudflare.com and place them in . / nginx
 ```
+### Run on dev via Docker
+```
+Make a file entrypoint.sh executable (sudo chmod +x entrypoint.sh)
+Run docker-compose -f docker-compose-dev.yml up --build (-d for detach mode)
+```
 
 <br/>
 
