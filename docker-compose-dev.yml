@@ -3,16 +3,17 @@ version: '3.7'
 services:
   django:
     build: .
-    command: gunicorn murr_back.wsgi:application --bind 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:7391
     env_file:
-      - ./.env.dev
+      - .env.dev
     depends_on:
       - db
     expose:
-      - 8000
+      - 7391
     volumes:
       - static_volume:/home/murrengan/staticfiles
       - ./media:/home/murrengan/media
+      - ./:/home/murrengan
   db:
     image: postgres:11
     volumes:
@@ -24,17 +25,30 @@ services:
   nginx:
     image: nginx:mainline-alpine
     ports:
-      - 80:80
-      - 443:443
+      - 8000:8000
+      - 80:8000
     volumes:
       - static_volume:/home/murrengan/staticfiles
       - ./media:/home/murrengan/media
       - ./dist:/home/murrengan/murr_front/dist
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/dev:/etc/nginx/conf.d
     depends_on:
       - django
+  redis:
+    image: redis:latest
+  bot:
+    build:
+      context: ./
+      dockerfile: Dockerfile_bot
+    command: python manage.py bot
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+
 volumes:
   postgres_data:
   static_volume:
   media:
   dist:
+  redisdata:

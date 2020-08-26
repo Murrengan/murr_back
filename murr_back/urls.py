@@ -5,7 +5,7 @@ from django.urls import path, include
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin_panel_secure_url/', admin.site.urls),
 
     # 3rd party
     path('auth/', include('djoser.urls')),

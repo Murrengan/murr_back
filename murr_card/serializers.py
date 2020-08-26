@@ -5,10 +5,12 @@ from .models import MurrCard, EditorImageForMurrCard
 
 class MurrCardSerializers(serializers.ModelSerializer):
     owner_name = serializers.ReadOnlyField(source='owner.username')
+    owner_url = serializers.ReadOnlyField(source='owner.murren_url')
 
     class Meta:
         model = MurrCard
-        fields = ('owner', 'title', 'cover', 'content', 'id', 'owner_name')
+        fields = ('owner', 'title', 'cover', 'content', 'id', 'owner_name', 'owner_url')
+        read_only_fields = ('owner_url', )
 
 
 class EditorImageForMurrCardSerializers(serializers.ModelSerializer):

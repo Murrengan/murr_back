@@ -14,4 +14,5 @@ class PublicMurrenInfoSerializers(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Murren
-        fields = ('id', 'username', 'email', 'murren_avatar')
+        fields = ('id', 'username', 'email', 'murren_avatar', 'murren_url')
+        read_only_fields = ('murren_url',)
