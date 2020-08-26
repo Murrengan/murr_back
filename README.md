@@ -58,7 +58,7 @@ pytest
 Сделать файл entrypoint.sh исполняемым (sudo chmod +x entrypoint.sh)
 Запустить docker-compose -f docker-compose-dev.yml up --build (-d для детач режима)
 ```
-
+#### Если ты на windows - убедись, что для entrypoint.sh стоит line separator LF вместо CRLF (можно сменить в pycharm )
 <br/>
 
 <h2 align="center">Скачивай, тренируйся и принимай участие в улучшении функционала!❤</h2>

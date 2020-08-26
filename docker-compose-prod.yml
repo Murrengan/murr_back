@@ -5,7 +5,7 @@ services:
     build: .
     command: gunicorn murr_back.wsgi:application --bind 0.0.0.0:8000
     env_file:
-      - ./.env.dev
+      - .env.prod
     depends_on:
       - db
     expose:
@@ -33,6 +33,17 @@ services:
       - ./nginx:/etc/nginx/conf.d
     depends_on:
       - django
+  redis:
+    image: redis:latest
+  bot:
+    build:
+      context: ./
+      dockerfile: Dockerfile_bot
+    command: python manage.py bot
+    env_file:
+      - .env.prod
+    depends_on:
+      - db
 volumes:
   postgres_data:
   static_volume:

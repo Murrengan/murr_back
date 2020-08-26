@@ -56,7 +56,7 @@ For https, get origin_ca_rsa_root.pem and private_origin_ca_ecc_root.pem certifi
 Make a file entrypoint.sh executable (sudo chmod +x entrypoint.sh)
 Run docker-compose -f docker-compose-dev.yml up --build (-d for detach mode)
 ```
-
+#### If you are on windows, make sure that entrypoint.sh should line separator LF instead of CRLF (can be changed in pycharm )
 <br/>
 
 <h2 align="center">Download, train and take part in improving the functionality!❤</h2>
