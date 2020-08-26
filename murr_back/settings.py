@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'murren.apps.MurrenConfig',
     'murr_card.apps.MurrCardConfig',
     'murr_chat.apps.MurrChatConfig',
+    'murr_bot.apps.MurrBotConfig'
 ]
 
 MIDDLEWARE = [
