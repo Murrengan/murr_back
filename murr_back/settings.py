@@ -1,3 +1,4 @@
+import datetime
 import os
 from datetime import timedelta
 
@@ -16,21 +17,28 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     # 3rd party
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'djoser',
     'channels',
-
-    # if we want to add refresh token to blacklist
-    # 'rest_framework_simplejwt.token_blacklist',
+    'rest_auth',
+    'rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     # local
     'murren.apps.MurrenConfig',
     'murr_card.apps.MurrCardConfig',
     'murr_chat.apps.MurrChatConfig',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     # 3rd party
@@ -46,6 +54,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'murr_back.middleware.CheckRecaptchaMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = 'murr_back.urls'
@@ -125,7 +137,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 AUTH_USER_MODEL = 'murren.Murren'
 
 CORS_ORIGIN_WHITELIST = [
-
     "http://localhost:8080",
     "http://localhost:8000",
     "http://127.0.0.1:8080",
@@ -143,22 +154,19 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 30
 }
 
-SIMPLE_JWT = {
+REST_USE_JWT = True
 
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
-    # 'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    # 'ROTATE_REFRESH_TOKENS': True,
-
-    # when we want to add refresh token to blacklist, uncomment this field and make migrations.
-    # with this have some problem to remove murren form db
-    # 'BLACKLIST_AFTER_ROTATION': True,
+JWT_AUTH = {
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=14),
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 RECAPTCHA_URL_PROTECTED = (
