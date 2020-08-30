@@ -6,8 +6,6 @@ from django.conf import settings
 from django.db import close_old_connections
 from django.http import JsonResponse
 from jwt import decode as jwt_decode
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from rest_framework_simplejwt.tokens import UntypedToken
 
 from common_helpers.recaptcha import check_recaptcha
 
@@ -51,14 +49,8 @@ class SocketTokenAuthMiddleware:
         if scope['headers'][0][0] == 'pytest':
             return self.inner(dict(scope, user=scope['headers'][0][1]))
         token = parse_qs(scope["query_string"].decode("utf8"))["token"][0]
-
-        try:
-            UntypedToken(token)
-        except (InvalidToken, TokenError):
-            return None
-        else:
-            decoded_data = jwt_decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-
-            pk = decoded_data["user_id"]
+        #  todo add token verification
+        decoded_data = jwt_decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        pk = decoded_data["user_id"]
 
         return self.inner(dict(scope, user=pk))
