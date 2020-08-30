@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
     'channels',
+    'mptt',
 
     # if we want to add refresh token to blacklist
     # 'rest_framework_simplejwt.token_blacklist',
@@ -30,7 +31,8 @@ INSTALLED_APPS = [
     'murren.apps.MurrenConfig',
     'murr_card.apps.MurrCardConfig',
     'murr_chat.apps.MurrChatConfig',
-    'murr_bot.apps.MurrBotConfig'
+    'murr_bot.apps.MurrBotConfig',
+    'murr_comments.apps.MurrCommentsConfig',
 ]
 
 MIDDLEWARE = [

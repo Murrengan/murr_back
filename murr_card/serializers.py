@@ -24,4 +24,4 @@ class AllMurrSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MurrCard
-        fields = ('owner_name', 'title', 'cover', 'id')
+        fields = ('id', 'title', 'cover', 'owner_name')

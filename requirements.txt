@@ -69,3 +69,4 @@ wcwidth==0.1.8
 yarl==1.5.1
 zipp==3.0.0
 zope.interface==5.0.2
+djangorestframework-recursive==0.1.2
