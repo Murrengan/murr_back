@@ -56,11 +56,11 @@ def test_create_murren(api_client, yml_dataset, test_password, test_email, test_
         'username': username,
         'password': password,
     }
-    url = reverse('obtain_token_pair')
+    url = reverse('obtain_jwt_token')
     response = api_client.post(url, data, format='json')
     assert response.status_code == 200, json.loads(response.content)
 
-    access_token = response.data['access']
+    access_token = response.data['token']
     api_client.credentials(HTTP_AUTHORIZATION='Bearer {}'.format(access_token))
 
     url = reverse('get_tanochka_img')
