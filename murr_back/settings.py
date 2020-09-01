@@ -31,12 +31,14 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'mptt',
 
     # local
     'murren.apps.MurrenConfig',
     'murr_card.apps.MurrCardConfig',
     'murr_chat.apps.MurrChatConfig',
-    'murr_bot.apps.MurrBotConfig'
+    'murr_bot.apps.MurrBotConfig',
+    'murr_comments.apps.MurrCommentsConfig',
 ]
 
 SITE_ID = 1
