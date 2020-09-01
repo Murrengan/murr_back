@@ -1,7 +1,7 @@
 import logging
 
+from django.db.models import Subquery, Count
 from rest_framework import status
-from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
@@ -16,7 +16,8 @@ from murr_comments.models import Comment
 from murr_comments.serializers import CommentSerializer
 from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
-from .services import generate_user_cover
+
+from .services import generate_user_cover, rating_handler, get_rating_query
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +29,16 @@ class MurrPagination(PageNumberPagination):
 
 
 class MurrCardViewSet(ModelViewSet):
-    queryset = MurrCard.objects.select_related('owner').order_by('-timestamp')
     serializer_class = AllMurrSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
+
+    def get_queryset(self):
+        likes, dislikes = get_rating_query()
+        queryset = MurrCard.objects.select_related('owner').annotate(
+            rating=Count(Subquery(likes)) - Count(Subquery(dislikes))
+        ).order_by('-timestamp')
+        return queryset
 
     @action(detail=True)
     def comments(self, request, *args, **kwargs):
@@ -45,6 +52,18 @@ class MurrCardViewSet(ModelViewSet):
         )
         serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, permission_classes=[IsAuthenticated])
+    def like(self, request, *args, **kwargs):
+        instance = self.get_object()
+        rating_handler(request.user.id, instance.id, 'Card', 'Like')
+        return Response(status=200)
+
+    @action(detail=True, permission_classes=[IsAuthenticated])
+    def dislike(self, request, *args, **kwargs):
+        instance = self.get_object()
+        rating_handler(request.user.id, instance.id, 'Card', 'Dislike')
+        return Response(status=200)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
