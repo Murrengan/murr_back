@@ -1,7 +1,6 @@
 import logging
 
 from rest_framework import status
-from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
@@ -39,7 +38,8 @@ class MurrCardViewSet(ModelViewSet):
         """
         instance = self.get_object()
         queryset = cache_tree_children(
-            Comment.objects.filter(card=instance).select_related('author', 'card', 'parent')
+            # select_related - это джойн табилчек в 1 запрос
+            Comment.objects.filter(murr=instance).select_related('author', 'murr', 'parent')
         )
         serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)

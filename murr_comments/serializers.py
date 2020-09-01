@@ -23,7 +23,7 @@ class ChildSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author_id = serializers.IntegerField(label='Автор')
     author_username = serializers.CharField(source='author.username', read_only=True)
-    parent_id = serializers.IntegerField(label='Родитель')
+    parent_id = serializers.IntegerField(label='Родитель', default=None)
     murr_id = serializers.IntegerField(label='Мурр кард')
     created = serializers.DateTimeField(read_only=True)
     children = serializers.SerializerMethodField()
