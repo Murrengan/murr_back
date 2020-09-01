@@ -35,6 +35,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'mptt',
+
+    # if we want to add refresh token to blacklist
+    # 'rest_framework_simplejwt.token_blacklist',
 
     # local
     'murren.apps.MurrenConfig',
