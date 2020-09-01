@@ -18,8 +18,6 @@ from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
 from .services import generate_user_cover
 
-logger = logging.getLogger(__name__)
-
 
 class MurrPagination(PageNumberPagination):
     page_size = 30

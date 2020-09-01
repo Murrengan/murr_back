@@ -9,7 +9,7 @@ from murr_card.models import MurrCard
 class Comment(MPTTModel):
     author = models.ForeignKey(Murren, verbose_name='Автор', related_name='comments', on_delete=models.CASCADE)
     parent = TreeForeignKey('self', related_name='children', on_delete=models.CASCADE, null=True, blank=True)
-    card = models.ForeignKey(MurrCard, related_name='comments', on_delete=models.CASCADE)
+    murr = models.ForeignKey(MurrCard, related_name='comments', on_delete=models.CASCADE)
     text = models.TextField('Комментарий')
     created = models.DateTimeField('Дата написания', auto_now_add=True, blank=True)
 

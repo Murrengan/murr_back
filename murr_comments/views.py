@@ -10,8 +10,10 @@ from .serializers import CommentSerializer
 
 
 class CommentViewSet(ModelViewSet):
-    queryset = cache_tree_children(Comment.objects.select_related('card', 'author', 'parent'))
     serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        return cache_tree_children(Comment.objects.select_related('murr', 'author', 'parent'))
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -24,7 +26,7 @@ class CommentViewSet(ModelViewSet):
         queryset = cache_tree_children(
             Comment.objects.get_queryset_descendants(
                 Comment.objects.filter(pk=pk), include_self=True
-            ).select_related('author', 'card', 'parent')
+            ).select_related('author', 'murr', 'parent')
         )
         serializer = CommentSerializer(queryset, many=True)
 
