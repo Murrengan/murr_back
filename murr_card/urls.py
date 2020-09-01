@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from .views import MurrCardViewSet, EditorImageForMurrCardView
 
 router = DefaultRouter()
-router.register('', MurrCardViewSet)
+router.register('', MurrCardViewSet, basename='murr_card')
 
 urlpatterns = [
     path('save_editor_image/', csrf_exempt(EditorImageForMurrCardView.as_view()), name='save_editor_image'),
