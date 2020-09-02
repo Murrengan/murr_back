@@ -36,6 +36,11 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
+##### Подготовка теста
+```
+python manage.py prepare_stand
+```
+
 ##### Запуск сервера
 ```
 python manage.py runserver
