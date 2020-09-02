@@ -1,5 +1,5 @@
-from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -10,24 +10,30 @@ from .serializers import CommentSerializer
 
 
 class CommentViewSet(ModelViewSet):
-    queryset = cache_tree_children(Comment.objects.select_related('card', 'author', 'parent'))
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Comment.objects.select_related('author', 'murr', 'parent')
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return self.get_response(queryset)
 
     def retrieve(self, request, *args, **kwargs):
         """
-        Получить комментарий и дерево всех его потомков
+        Retrieve all descendants of object
         """
-        pk = kwargs.pop('pk')
-        if not pk.isdigit():
-            raise NotFound()
+        instance = self.get_object()
+        queryset = Comment.objects.get_queryset_descendants(Comment.objects.filter(id=instance.id), include_self=True)\
+            .select_related('author', 'murr', 'parent')
+        return self.get_response(queryset)
 
-        queryset = cache_tree_children(
-            Comment.objects.get_queryset_descendants(
-                Comment.objects.filter(pk=pk), include_self=True
-            ).select_related('author', 'card', 'parent')
-        )
-        serializer = CommentSerializer(queryset, many=True)
-
-        if not serializer.data:
-            raise NotFound()
+    def get_response(self, queryset):
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(cache_tree_children(page), many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(cache_tree_children(queryset), many=True)
         return Response(serializer.data)

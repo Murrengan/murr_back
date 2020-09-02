@@ -19,8 +19,6 @@ from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers,
 
 from .services import generate_user_cover, rating_handler, get_rating_query
 
-logger = logging.getLogger(__name__)
-
 
 class MurrPagination(PageNumberPagination):
     page_size = 30
@@ -48,7 +46,8 @@ class MurrCardViewSet(ModelViewSet):
         """
         instance = self.get_object()
         queryset = cache_tree_children(
-            Comment.objects.filter(card=instance).select_related('author', 'card', 'parent')
+            # select_related - это джойн табилчек в 1 запрос
+            Comment.objects.filter(murr=instance).select_related('author', 'murr', 'parent')
         )
         serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)
