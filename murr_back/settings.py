@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
     'channels',
-    'debug_toolbar',
+    'mptt',
     'django_filters',
 
     # if we want to add refresh token to blacklist
@@ -60,13 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'murr_back.middleware.CheckRecaptchaMiddleware',
-]
-
-INTERNAL_IPS = [
-    '127.0.0.1',
 ]
 
 AUTHENTICATION_BACKENDS = [

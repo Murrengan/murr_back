@@ -1,6 +1,8 @@
 from django.db.models import Count, Subquery
 
 
+from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,6 +17,7 @@ from murr_rating.services import RatingActionsMixin, get_rating_query
 
 class CommentViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_fields = ('murr', 'parent', 'author')
 
