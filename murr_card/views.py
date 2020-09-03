@@ -1,20 +1,22 @@
-import logging
+from django.db.models import Subquery, Count
+
 
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
-from mptt.templatetags.mptt_tags import cache_tree_children
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 from murr_back.settings import LOCALHOST
-from murr_comments.models import Comment
-from murr_comments.serializers import CommentSerializer
+from murr_rating.services import RatingActionsMixin, get_rating_query
+
 from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
+
 from .services import generate_user_cover
 
 
@@ -24,25 +26,19 @@ class MurrPagination(PageNumberPagination):
     max_page_size = 60
 
 
-class MurrCardViewSet(ModelViewSet):
-    queryset = MurrCard.objects.select_related('owner').order_by('-timestamp')
+class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = AllMurrSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
+    filter_backends = [DjangoFilterBackend]
+    filter_fields = ['owner']
 
-    @action(detail=True)
-    def comments(self, request, *args, **kwargs):
-        """
-        Получить все комментраии у мурра
-        example url: /api/murr_card/1/comments
-        """
-        instance = self.get_object()
-        queryset = cache_tree_children(
-            # select_related - это джойн табилчек в 1 запрос
-            Comment.objects.filter(murr=instance).select_related('author', 'murr', 'parent')
-        )
-        serializer = CommentSerializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        likes, dislikes = get_rating_query('MurrCard')
+        queryset = MurrCard.objects.select_related('owner').annotate(
+            rating=Count(Subquery(likes)) - Count(Subquery(dislikes))
+        ).order_by('-timestamp')
+        return queryset
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
