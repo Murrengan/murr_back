@@ -16,6 +16,3 @@ class Comment(MPTTModel):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-
-    def __str__(self):
-        return f'{self.author.username} прокомментировал {self.card.title}'

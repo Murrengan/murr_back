@@ -1,36 +1,53 @@
-from rest_framework.exceptions import NotFound
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.db.models import Count, Subquery
+
+
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+from django_filters.rest_framework import DjangoFilterBackend
 from mptt.templatetags.mptt_tags import cache_tree_children
+
 
 from .models import Comment
 from .serializers import CommentSerializer
 
+from murr_rating.services import RatingActionsMixin, get_rating_query
 
-class CommentViewSet(ModelViewSet):
+
+class CommentViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filter_fields = ('murr', 'parent', 'author')
 
     def get_queryset(self):
-        return cache_tree_children(Comment.objects.select_related('murr', 'author', 'parent'))
+        likes, dislikes = get_rating_query('Comment')
+        queryset = cache_tree_children(Comment.objects.select_related('author', 'murr', 'parent').annotate(
+            rating=Count(Subquery(likes)) - Count(Subquery(dislikes))
+        ))
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return self.get_response(queryset)
 
     def retrieve(self, request, *args, **kwargs):
         """
-        Получить комментарий и дерево всех его потомков
+        Retrieve object and all of its descendants
         """
-        pk = kwargs.pop('pk')
-        if not pk.isdigit():
-            raise NotFound()
+        instance = self.get_object()
+        queryset = Comment.objects\
+            .get_queryset_descendants(Comment.objects.filter(id=instance.id), include_self=True)\
+            .select_related('author', 'murr', 'parent')
+        return self.get_response(queryset)
 
-        queryset = cache_tree_children(
-            Comment.objects.get_queryset_descendants(
-                Comment.objects.filter(pk=pk), include_self=True
-            ).select_related('author', 'murr', 'parent')
-        )
-        serializer = CommentSerializer(queryset, many=True)
+    def get_response(self, queryset):
+        page = self.paginate_queryset(queryset)
 
-        if not serializer.data:
-            raise NotFound()
+        if page is not None:
+            serializer = self.get_serializer(cache_tree_children(page), many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(cache_tree_children(queryset), many=True)
         return Response(serializer.data)

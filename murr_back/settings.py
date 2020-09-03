@@ -25,13 +25,17 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
     'channels',
+    'mptt',
+    'django_filters',
+
+    # if we want to add refresh token to blacklist
+    # 'rest_framework_simplejwt.token_blacklist',
     'rest_auth',
     'rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'mptt',
 
     # local
     'murren.apps.MurrenConfig',
@@ -39,6 +43,7 @@ INSTALLED_APPS = [
     'murr_chat.apps.MurrChatConfig',
     'murr_bot.apps.MurrBotConfig',
     'murr_comments.apps.MurrCommentsConfig',
+    'murr_rating.apps.MurrRatingConfig',
 ]
 
 SITE_ID = 1
@@ -160,6 +165,7 @@ REST_FRAMEWORK = {
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'PAGE_SIZE': 30
 }
 
