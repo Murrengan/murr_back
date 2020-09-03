@@ -67,8 +67,6 @@ IS_CAPTCHA = os.getenv("IS_CAPTCHA")
 if IS_CAPTCHA:
     MIDDLEWARE.append('murr_back.middleware.CheckRecaptchaMiddleware')
 
-print(MIDDLEWARE)
-
 AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
