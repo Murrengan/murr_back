@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.test import APITestCase
 
 from murr_card.models import MurrCard
@@ -19,40 +21,40 @@ class RatingTests(APITestCase):
         like_card_url = f'{self.api}/{self.test_card.id}/like/'
         dislike_card_url = f'{self.api}/{self.test_card.id}/dislike/'
 
-        response = self.client.get(like_card_url)
+        response = self.client.post(like_card_url)
         self.assertEqual(response.status_code, 401)
 
         self.client.force_authenticate(self.test_user)
 
-        response = self.client.get(like_card_url)
+        response = self.client.post(like_card_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.get_rating().rating_type, 'Like')
 
-        response = self.client.get(like_card_url)
+        response = self.client.post(like_card_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.get_rating(), None)
 
-        response = self.client.get(dislike_card_url)
+        response = self.client.post(dislike_card_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.get_rating().rating_type, 'Dislike')
 
-        response = self.client.get(dislike_card_url)
+        response = self.client.post(dislike_card_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.get_rating(), None)
 
-        response = self.client.get(dislike_card_url)
+        response = self.client.post(dislike_card_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.get_rating().rating_type, 'Dislike')
 
-        response = self.client.get(like_card_url)
+        response = self.client.post(like_card_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.get_rating().rating_type, 'Like')
 
         self.assertEqual(self.get_rating().rating_type, 'Like')
-        response = self.client.get(dislike_card_url)
+        response = self.client.post(dislike_card_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.get_rating().rating_type, 'Dislike')
 
-        response = self.client.get(dislike_card_url)
+        response = self.client.post(dislike_card_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.get_rating(), None)

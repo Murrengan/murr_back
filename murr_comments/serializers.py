@@ -7,10 +7,11 @@ from .models import Comment
 class ChildSerializer(serializers.ModelSerializer):
     author_username = serializers.CharField(source='author.username', read_only=True)
     children = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(label='Рейтинг', default=0, read_only=True)
 
     class Meta:
         model = Comment
-        fields = ('id', 'author', 'author_username', 'parent', 'murr', 'text', 'created', 'children')
+        fields = ('id', 'author', 'author_username', 'parent', 'murr', 'text', 'created', 'rating', 'children')
 
     def get_children(self, parent):
         queryset = parent.get_children()
@@ -21,6 +22,7 @@ class ChildSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author_username = serializers.CharField(source='author.username', read_only=True)
     children = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(label='Рейтинг', default=0, read_only=True)
 
     def get_children(self, parent):
         queryset = parent.get_children()
@@ -29,4 +31,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'author', 'author_username', 'parent', 'murr', 'text', 'created', 'children')
+        fields = ('id', 'author', 'author_username', 'parent', 'murr', 'text', 'created', 'rating', 'children')

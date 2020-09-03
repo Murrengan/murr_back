@@ -1,3 +1,7 @@
+from django.db.models import Count, Subquery
+
+
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -9,8 +13,10 @@ from .services import CommentPagination
 from .models import Comment
 from .serializers import CommentSerializer
 
+from murr_rating.services import RatingActionsMixin, get_rating_query
 
-class CommentViewSet(ModelViewSet):
+
+class CommentViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -18,7 +24,10 @@ class CommentViewSet(ModelViewSet):
     filter_fields = ('murr', 'parent', 'author')
 
     def get_queryset(self):
-        queryset = Comment.objects.select_related('author', 'murr', 'parent')
+        likes, dislikes = get_rating_query('Comment')
+        queryset = Comment.objects.select_related('author', 'murr', 'parent').annotate(
+            rating=Count(Subquery(likes)) - Count(Subquery(dislikes))
+        )
         return queryset
 
     def list(self, request, *args, **kwargs):

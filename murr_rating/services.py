@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from murr_card.models import Murren
 from murr_rating.models import Rating
 
 
@@ -12,14 +13,14 @@ class RatingActionsMixin:
     def like(self, request, pk=None):
         instance = self.get_object()
         object_type = instance.__class__.__name__
-        rating_handler(request.user.id, instance.id, object_type, 'Like')
+        rating_handler(request.user, instance.id, object_type, 'Like')
         return Response(status=200)
 
     @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
     def dislike(self, request, pk=None):
         instance = self.get_object()
         object_type = instance.__class__.__name__
-        rating_handler(request.user.id, instance.id, object_type, 'Dislike')
+        rating_handler(request.user, instance.id, object_type, 'Dislike')
         return Response(status=200)
 
 
@@ -33,14 +34,14 @@ def get_rating_query(object_type: str) -> tuple:
     return likes, dislikes
 
 
-def rating_handler(murren_id: int, obj_id: int, obj_type: str, rating_type: str) -> None:
+def rating_handler(murren: Murren, object_id: int, object_type: str, rating_type: str) -> None:
     """
     Rating logic handler
     1. Get or create rating instance
     2. If not is_created and instance.rating_type == rating_type: instance.delete() (cancel action)
        Otherwise rating instance will save with rating_type
     """
-    rating, is_created = Rating.objects.get_or_create(murren_id=murren_id, object_id=obj_id, object_type=obj_type)
+    rating, is_created = Rating.objects.get_or_create(murren=murren, object_id=object_id, object_type=object_type)
     if not is_created and rating.rating_type == rating_type:
         rating.delete()
     else:
