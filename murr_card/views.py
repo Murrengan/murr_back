@@ -1,24 +1,17 @@
-import logging
-
-
 from django.db.models import Subquery, Count
-from django.shortcuts import redirect
-from django.urls import reverse
+
 
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
-from mptt.templatetags.mptt_tags import cache_tree_children
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 from murr_back.settings import LOCALHOST
-from murr_comments.models import Comment
-from murr_comments.serializers import CommentSerializer
 from murr_rating.services import RatingActionsMixin, get_rating_query
 
 from .models import MurrCard
@@ -37,6 +30,8 @@ class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = AllMurrSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
+    filter_backends = [DjangoFilterBackend]
+    filter_fields = ['owner']
 
     def get_queryset(self):
         likes, dislikes = get_rating_query('MurrCard')

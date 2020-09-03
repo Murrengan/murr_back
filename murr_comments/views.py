@@ -23,14 +23,14 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet):
 
     def get_queryset(self):
         likes, dislikes = get_rating_query('Comment')
-        queryset = cache_tree_children(Comment.objects.select_related('author', 'murr', 'parent').annotate(
+        queryset = Comment.objects.select_related('author', 'murr', 'parent').annotate(
             rating=Count(Subquery(likes)) - Count(Subquery(dislikes))
-        ))
+        )
         return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        return self.get_response(queryset)
+        return self.get_cached_response(queryset)
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -40,12 +40,12 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet):
         queryset = Comment.objects\
             .get_queryset_descendants(Comment.objects.filter(id=instance.id), include_self=True)\
             .select_related('author', 'murr', 'parent')
-        return self.get_response(queryset)
+        return self.get_cached_response(queryset)
 
-    def get_response(self, queryset):
+    def get_cached_response(self, queryset):
         page = self.paginate_queryset(queryset)
 
-        if page is not None:
+        if page:
             serializer = self.get_serializer(cache_tree_children(page), many=True)
             return self.get_paginated_response(serializer.data)
 
