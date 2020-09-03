@@ -1,11 +1,7 @@
 import base64
 
 from django.core.files.base import ContentFile
-from django.db.models import OuterRef
 from django.utils.crypto import get_random_string
-
-from murren.models import Murren
-from murr_rating.models import Rating
 
 
 def generate_user_cover(cover):

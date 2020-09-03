@@ -1,6 +1,3 @@
-from django.db.models import Subquery, Count
-
-
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -12,7 +9,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 from murr_back.settings import LOCALHOST
-from murr_rating.services import RatingActionsMixin, get_rating_query
 
 from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
@@ -26,18 +22,15 @@ class MurrPagination(PageNumberPagination):
     max_page_size = 60
 
 
-class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
+class MurrCardViewSet(ModelViewSet):
     serializer_class = AllMurrSerializer
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['owner']
 
     def get_queryset(self):
-        likes, dislikes = get_rating_query('MurrCard')
-        queryset = MurrCard.objects.select_related('owner').annotate(
-            rating=Count(Subquery(likes)) - Count(Subquery(dislikes))
-        ).order_by('-timestamp')
+        queryset = MurrCard.objects.select_related('owner').order_by('-timestamp')
         return queryset
 
     def retrieve(self, request, *args, **kwargs):
