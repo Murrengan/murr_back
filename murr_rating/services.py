@@ -8,14 +8,14 @@ from murr_rating.models import Rating
 
 class RatingActionsMixin:
 
-    @action(detail=True, permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         instance = self.get_object()
         object_type = instance.__class__.__name__
         rating_handler(request.user.id, instance.id, object_type, 'Like')
         return Response(status=200)
 
-    @action(detail=True, permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
     def dislike(self, request, pk=None):
         instance = self.get_object()
         object_type = instance.__class__.__name__

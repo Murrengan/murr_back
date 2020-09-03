@@ -18,7 +18,7 @@ from murr_rating.services import RatingActionsMixin, get_rating_query
 
 class CommentViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_fields = ('murr', 'parent', 'author')
     pagination_class = CommentPagination
@@ -46,10 +46,5 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet):
 
     def get_cached_response(self, queryset):
         page = self.paginate_queryset(queryset.get_cached_trees())
-
-        if page:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)

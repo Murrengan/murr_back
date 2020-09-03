@@ -28,7 +28,7 @@ class MurrPagination(PageNumberPagination):
 
 class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = AllMurrSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['owner']
