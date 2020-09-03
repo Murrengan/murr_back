@@ -6,7 +6,7 @@ from .models import Comment
 
 class ChildSerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
-    author = serializers.CharField(source='author.username')
+    author_username = serializers.CharField(source='author.username')
     murr_id = serializers.CharField(source='murr.id')
     created = serializers.DateTimeField(read_only=True)
     rating = serializers.IntegerField(label='Рейтинг', default=0, read_only=True)

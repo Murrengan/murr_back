@@ -6,7 +6,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from django_filters.rest_framework import DjangoFilterBackend
-from mptt.templatetags.mptt_tags import cache_tree_children
+
+from .services import CommentPagination
 
 
 from .models import Comment
@@ -20,6 +21,7 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_fields = ('murr', 'parent', 'author')
+    pagination_class = CommentPagination
 
     def get_queryset(self):
         likes, dislikes = get_rating_query('Comment')
@@ -43,11 +45,11 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet):
         return self.get_cached_response(queryset)
 
     def get_cached_response(self, queryset):
-        page = self.paginate_queryset(queryset)
+        page = self.paginate_queryset(queryset.get_cached_trees())
 
         if page:
-            serializer = self.get_serializer(cache_tree_children(page), many=True)
+            serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(cache_tree_children(queryset), many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
