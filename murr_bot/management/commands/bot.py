@@ -21,7 +21,7 @@ class Command(BaseCommand):
         executor.start_polling(dp)
 
 
-TOKEN = os.environ.get("BOT_TOKEN", '737836476:AAE8WivMe26JfPm0hu28mAkBzpuxf5fs6Kk')
+TOKEN = os.environ.get("BOT_TOKEN", '635496211:AAFGUjMa_NgSQ5c-Cr_19qLnq3HDZigrwx4')
 
 storage = RedisStorage2(host=os.environ.get("REDIS_HOST", 'localhost'), db=5)
 bot = Bot(token=TOKEN)
@@ -83,6 +83,11 @@ class ThrottlingMiddleware(BaseMiddleware):
             raise CancelHandler()
 
     async def message_throttled(self, message: types.Message, throttled: Throttled):
+        # Если сообщение пришло из чата из списка
+        # имя которого (message.chat.title) в списке name_of_chats_with_murr_bot
+        # то указывай переданный таймаут
+        # если нет - укахывай стандартный таймаут на 5 секунд
+        # name_of_chats_with_murr_bot = ['DELETE_MURR_bot']
 
         handler = current_handler.get()
         dispatcher = Dispatcher.get_current()
@@ -94,10 +99,15 @@ class ThrottlingMiddleware(BaseMiddleware):
         # Calculate how many time is left till the block ends
         delta = throttled.rate - throttled.delta
 
-        # # Prevent flooding
+        # Prevent flooding
         if throttled.exceeded_count <= 2:
-            await bot.send_message(chat_id=message.chat.id,
-                                   text=f'Команда {message.text} работает 1 раз в {throttled.rate} секунд')
+            name_of_chats_with_murr_bot = ['DELETE_MURR_bot']
+            if message.chat.title in name_of_chats_with_murr_bot:
+                await bot.send_message(chat_id=message.chat.id,
+                                       text=f'Команда {message.text} работает 1 раз в {throttled.rate} секунд')
+            else:
+                await bot.send_message(chat_id=message.chat.id,
+                                       text=f'Команда {message.text} доступна всегда')
 
         await message.delete()
 
@@ -113,7 +123,7 @@ class ThrottlingMiddleware(BaseMiddleware):
 
 
 @dp.message_handler(commands=['sexy'])
-@rate_limit(30, 'antiflood_sexy')
+@rate_limit(5, 'antiflood_sexy')
 async def cmd_test(message: types.Message):
     my_ids = list(Coub.objects.values_list('id', flat=True))
     rand_id = random.sample(my_ids, 1)[0]
