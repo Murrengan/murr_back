@@ -15,6 +15,15 @@ from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers,
 
 from .services import generate_user_cover
 
+from rest_framework import filters
+from rest_framework import generics
+
+class MurrCardSearch(generics.ListAPIView):
+    queryset = MurrCard.objects.all()
+    serializer_class = MurrCardSerializers
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title']
+
 
 class MurrPagination(PageNumberPagination):
     page_size = 30
