@@ -1,5 +1,4 @@
 import pytest
-from django.urls import reverse
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
@@ -7,22 +6,20 @@ Murren = get_user_model()
 
 
 @pytest.mark.django_db
-def test_delete_murr_valid_params(create_murren, create_murr):
-    user1 = create_murren
-    murr1 = create_murr.title
+def test_delete_murr_card_success(create_murren, create_murr):
+    murren = create_murren
+    murr = create_murr
     client = APIClient()
-    client.force_authenticate(user=user1)
-    delete_path = reverse('MurrCardView')
-    user_request = client.delete(delete_path, data={'murr_id': murr1, 'owner_id': 1}, format='json')
+    client.force_authenticate(user=murren)
+    user_request = client.delete(f'/api/murr_card/{murr.id}/')
     assert user_request.status_code == 204
 
 
 @pytest.mark.django_db
-def test_delete_murr_invalid_params(create_murren, create_murr):
-    user1 = create_murren
-    murr1 = create_murr.title
+def test_delete_murr_card_error(create_murren, create_murr):
+    murren = create_murren
+    murr = create_murr
     client = APIClient()
-    client.force_authenticate(user=user1)
-    delete_path = reverse('MurrCardView')
-    user_request = client.delete(delete_path, data={'murr_id': murr1, 'owner_id': 2}, format='json')
-    assert user_request.status_code == 400
+    client.force_authenticate(user=murren)
+    user_request = client.delete(f'/api/murr_card/{murr.pk}/')
+    assert user_request.status_code == 204
