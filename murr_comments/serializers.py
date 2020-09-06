@@ -10,12 +10,13 @@ class ChildSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'author', 'author_username', 'parent', 'murr', 'text', 'created', 'children')
+        fields = ('id', 'author', 'author_username', 'parent', 'murr', 'text', 'rating', 'created', 'children')
+        read_only_fields = ('rating', 'created')
 
     def get_children(self, parent):
         queryset = parent.get_children()
-        serialized_data = ChildSerializer(queryset, many=True, read_only=True, context=self.context)
-        return serialized_data.data
+        serializer = ChildSerializer(queryset, many=True, read_only=True, context=self.context)
+        return serializer.data
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -24,9 +25,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_children(self, parent):
         queryset = parent.get_children()
-        serialized_data = ChildSerializer(queryset, many=True, read_only=True, context=self.context)
-        return serialized_data.data
+        serializer = ChildSerializer(queryset, many=True, read_only=True, context=self.context)
+        return serializer.data
 
     class Meta:
         model = Comment
-        fields = ('id', 'author', 'author_username', 'parent', 'murr', 'text', 'created', 'children')
+        fields = ('id', 'author', 'author_username', 'parent', 'murr', 'text', 'rating', 'created', 'children')
+        read_only_fields = ('rating', 'created')
