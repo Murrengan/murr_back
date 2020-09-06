@@ -31,7 +31,7 @@ class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
     filter_fields = ['owner']
 
     def get_queryset(self):
-        queryset = MurrCard.objects.select_related('owner')
+        queryset = MurrCard.objects.select_related('owner').order_by('-timestamp')
         return queryset
 
     def retrieve(self, request, *args, **kwargs):

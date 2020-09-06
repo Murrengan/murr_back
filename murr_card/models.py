@@ -14,9 +14,6 @@ class MurrCard(RatingAbstractModel, models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Murren, on_delete=models.CASCADE, related_name='murr_cards')
 
-    class MPTTMeta:
-        order_insertion_by = ['-timestamp']
-
     def __str__(self):
         return self.title
 
