@@ -2,15 +2,20 @@ from PIL import Image
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from murr_rating.models import RatingAbstractModel
+
 Murren = get_user_model()
 
 
-class MurrCard(models.Model):
+class MurrCard(RatingAbstractModel, models.Model):
     title = models.CharField(max_length=224)
     cover = models.ImageField(blank=True, null=True, upload_to='murr_cover/%Y/%m/%d/')
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Murren, on_delete=models.CASCADE, related_name='murr_cards')
+
+    class MPTTMeta:
+        order_insertion_by = ['-timestamp']
 
     def __str__(self):
         return self.title
