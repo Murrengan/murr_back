@@ -1,10 +1,6 @@
-from django.db.models import OuterRef
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-from murr_card.models import Murren
-from murr_rating.models import Rating
 
 
 class RatingActionsMixin:
@@ -12,38 +8,29 @@ class RatingActionsMixin:
     @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
         instance = self.get_object()
-        object_type = instance.__class__.__name__
-        rating_handler(request.user, instance.id, object_type, 'Like')
-        return Response(status=200)
+        serializer = self.get_serializer(instance=instance)
+        rating_handler(request.user, instance, instance.liked_murrens, instance.disliked_murrens)
+        return Response(serializer.data)
 
     @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
     def dislike(self, request, pk=None):
         instance = self.get_object()
-        object_type = instance.__class__.__name__
-        rating_handler(request.user, instance.id, object_type, 'Dislike')
-        return Response(status=200)
+        serializer = self.get_serializer(instance=instance)
+        rating_handler(request.user, instance, instance.disliked_murrens, instance.liked_murrens)
+        return Response(serializer.data)
 
 
-def get_rating_query(object_type: str) -> tuple:
+def rating_handler(murren, instance, current, other):
     """
-    Get queryset's for an aggregate function to count difference between likes and dislikes
+    current, other - actions (like or dislike)
+    if current already exists: remove it (cancel action).
+    otherwise add a request user to current action. other remove.
     """
-    rating = Rating.objects.filter(object_id=OuterRef('pk'), object_type=object_type).only('pk')
-    likes = rating.filter(rating_type='Like')
-    dislikes = rating.filter(rating_type='Dislike')
-    return likes, dislikes
+    current_exists = current.filter(id=murren.id).first()
+    other_exists = other.filter(id=murren.id).first()
 
+    current.remove(murren) if current_exists else current.add(murren)
+    other.remove(murren) if other_exists else None
 
-def rating_handler(murren: Murren, object_id: int, object_type: str, rating_type: str) -> None:
-    """
-    Rating logic handler
-    1. Get or create rating instance
-    2. If not is_created and instance.rating_type == rating_type: instance.delete() (cancel action)
-       Otherwise rating instance will save with rating_type
-    """
-    rating, is_created = Rating.objects.get_or_create(murren=murren, object_id=object_id, object_type=object_type)
-    if not is_created and rating.rating_type == rating_type:
-        rating.delete()
-    else:
-        rating.rating_type = rating_type
-        rating.save()
+    instance.rating = instance.liked_murrens.count() - instance.disliked_murrens.count()
+    instance.save()
