@@ -1,3 +1,6 @@
+from django.db.models import Subquery, Count
+
+
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -9,6 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 from murr_back.settings import LOCALHOST
+from murr_rating.services import RatingActionsMixin
 
 from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
@@ -22,10 +26,10 @@ class MurrPagination(PageNumberPagination):
     max_page_size = 60
 
 
-class MurrCardViewSet(ModelViewSet):
+class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = AllMurrSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
+    permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['owner']
 

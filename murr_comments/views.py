@@ -1,16 +1,22 @@
+from django.db.models import Count, Subquery
+
+
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .services import CommentPagination
-
 
 from .models import Comment
+from .services import CommentPagination
 from .serializers import CommentSerializer
+from murr_rating.services import RatingActionsMixin
+
+from murr_rating.services import RatingActionsMixin
 
 
-class CommentViewSet(ModelViewSet):
+class CommentViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
     permission_classes = [IsAuthenticatedOrReadOnly]
