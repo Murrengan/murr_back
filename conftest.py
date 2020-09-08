@@ -19,7 +19,7 @@ def create_murren():
 def create_murr():
     murren = Murren.objects.get(pk=1)
     murr = MurrCard.objects.create(
-        title=1,
+        title="It's my cool sexy title",
         content="Halo, dat's not me",
         owner=murren,
     )
