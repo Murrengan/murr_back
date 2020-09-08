@@ -7,8 +7,9 @@ from rest_framework.viewsets import ModelViewSet
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from murr_back.settings import LOCALHOST
+from murr_rating.services import RatingActionsMixin
 
-from murr_back.settings import LOCALHOST, BASE_URL
 from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
 
@@ -21,7 +22,7 @@ class MurrPagination(PageNumberPagination):
     max_page_size = 60
 
 
-class MurrCardViewSet(ModelViewSet):
+class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = AllMurrSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
@@ -48,9 +49,7 @@ class MurrCardViewSet(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        author = instance.owner.id
-        login_user = request.user.id
-        if author == login_user:
+        if instance.owner == request.user:
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_403_FORBIDDEN)
@@ -64,6 +63,6 @@ class EditorImageForMurrCardView(APIView):
         murr_dict = {"success": 0, "file": {"url": ""}}
         if serializer.is_valid():
             serializer.save()
-            url = BASE_URL + serializer.data['murr_editor_image']
+            url = LOCALHOST + serializer.data['murr_editor_image']
             murr_dict = {"success": 1, "file": {"url": url}}
         return Response(murr_dict)

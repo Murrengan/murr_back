@@ -60,9 +60,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'murr_back.middleware.CheckRecaptchaMiddleware',
 ]
+
+IS_CAPTCHA = os.getenv("IS_CAPTCHA")
+
+if IS_CAPTCHA:
+    MIDDLEWARE.append('murr_back.middleware.CheckRecaptchaMiddleware')
 
 AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
