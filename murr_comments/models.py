@@ -17,3 +17,6 @@ class Comment(RatingAbstractModel, MPTTModel):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+
+    class MPTTMeta:
+        order_insertion_by = ['-rating', '-created']
