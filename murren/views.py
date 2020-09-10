@@ -1,9 +1,11 @@
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from django.contrib.auth import get_user_model
+from rest_auth.registration.views import SocialLoginView
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
-from rest_framework.pagination import PageNumberPagination
 
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
 
@@ -39,3 +41,7 @@ class GetAllMurrens(ListAPIView):
     queryset = Murren.objects.filter(is_active=True).order_by('-date_joined')
     serializer_class = MurrenSerializers
     pagination_class = PageNumberPagination
+
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter

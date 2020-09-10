@@ -35,10 +35,16 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
+##### Prepare test data - like admin user and etc
+```
+python manage.py prepare_stand
+```
+
 ##### Run for development
 ```
 python manage.py runserver
 ```
+
 
 ##### Run tests
 ```

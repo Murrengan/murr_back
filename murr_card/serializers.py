@@ -9,8 +9,8 @@ class MurrCardSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = MurrCard
-        fields = ('owner', 'title', 'cover', 'content', 'id', 'owner_name', 'owner_url')
-        read_only_fields = ('owner_url', )
+        fields = ('id', 'owner', 'title', 'cover', 'content', 'rating', 'owner_name', 'owner_url')
+        read_only_fields = ('owner_url', 'rating')
 
 
 class EditorImageForMurrCardSerializers(serializers.ModelSerializer):
@@ -24,4 +24,5 @@ class AllMurrSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MurrCard
-        fields = ('owner_name', 'title', 'cover', 'id')
+        fields = ('id', 'title', 'cover', 'rating', 'timestamp', 'owner_name')
+        read_only_fields = ('rating', 'timestamp')

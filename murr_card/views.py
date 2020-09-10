@@ -1,80 +1,19 @@
-import base64
-import logging
-
-from django.core.files.base import ContentFile
-from django.utils.crypto import get_random_string
 from rest_framework import status
-from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from murr_back.settings import LOCALHOST
+from murr_rating.services import RatingActionsMixin
+
 from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
 
-logger = logging.getLogger(__name__)
-
-
-class MurrCardView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get(self, request):
-
-        qs = MurrCard.objects.filter(id=request.query_params['murr_id'])
-        serializer = MurrCardSerializers(qs, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-
-        if request.data.get('cover'):
-            content = request.data['cover']
-            _, img_str = content.split('base64,')
-            image_extension = _.split('/')[-1].split(';')[0]
-            img_base64 = base64.b64decode(img_str)
-            image_b = ContentFile(img_base64)
-            image_b.name = get_random_string(length=6) + '.' + image_extension
-            request.data['cover'] = image_b
-
-        request.data['owner'] = request.user.id
-
-        serializer = MurrCardSerializers(data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-    
-    def delete(self, request):
-        murr = MurrCard.objects.get(id=request.data['murr_id'])
-        author = request.data['owner_id']
-        login_user = request.user.id
-        if author == login_user:
-            murr.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class EditorImageForMurrCardView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-
-        serializer = EditorImageForMurrCardSerializers(data=request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            url = LOCALHOST + serializer.data['murr_editor_image']
-            murr_dict = {"success": 1, "file": {"url": url}}
-
-            return Response(murr_dict)
-
-        else:
-
-            murr_dict = {"success": 0, "file": {"url": ""}}
-            return Response(murr_dict)
+from .services import generate_user_cover
 
 
 class MurrPagination(PageNumberPagination):
@@ -83,7 +22,47 @@ class MurrPagination(PageNumberPagination):
     max_page_size = 60
 
 
-class AllMurr(ListAPIView):
-    queryset = MurrCard.objects.all().order_by('-timestamp')
+class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = AllMurrSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
+    filter_backends = [DjangoFilterBackend]
+    filter_fields = ['owner']
+
+    def get_queryset(self):
+        queryset = MurrCard.objects.select_related('owner').order_by('-timestamp')
+        return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = MurrCardSerializers(instance)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        request.data['owner'] = request.user.id
+        request.data['cover'] = generate_user_cover(request.data.get('cover'))
+        serializer = MurrCardSerializers(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.owner == request.user:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+class EditorImageForMurrCardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = EditorImageForMurrCardSerializers(data=request.data)
+        murr_dict = {"success": 0, "file": {"url": ""}}
+        if serializer.is_valid():
+            serializer.save()
+            url = LOCALHOST + serializer.data['murr_editor_image']
+            murr_dict = {"success": 1, "file": {"url": url}}
+        return Response(murr_dict)

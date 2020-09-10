@@ -1,11 +1,15 @@
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 
-from .views import MurrCardView, EditorImageForMurrCardView, AllMurr
+from rest_framework.routers import DefaultRouter
+
+from .views import MurrCardViewSet, EditorImageForMurrCardView
+
+router = DefaultRouter()
+router.register('', MurrCardViewSet, basename='murr_card')
 
 urlpatterns = [
-    path('', csrf_exempt(MurrCardView.as_view()), name='MurrCardView'),
     path('save_editor_image/', csrf_exempt(EditorImageForMurrCardView.as_view()), name='save_editor_image'),
-    path('all/', csrf_exempt(AllMurr.as_view()), name='all_murrr'),
-
 ]
+
+urlpatterns += router.urls
