@@ -1,8 +1,9 @@
 name: my_murr_ci
 
 on:
-  pull_request:
+  push:
     branches: [ murr_bot ]
+    
 
 jobs:
   my_first_job:
@@ -11,10 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: 1 job MURR
+        run: echo from first job
 
-      - name: Run a multi-line script
+      - name: 2 job murr
         run: |
-          echo Add other actions to build,
+          echo ----------------------------
           echo test, and deploy your project.
+          echo ----------------------------
