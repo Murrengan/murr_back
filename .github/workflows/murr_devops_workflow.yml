@@ -15,7 +15,7 @@ jobs:
       - name: 1 job MURR
         run: |
           echo ----------------------------
-          pip3 install --upgrade setuptools
+          pip3 install --upgrade setuptools wheel
           echo ----------------------------
           pip3 install -r requirements.txt
           echo ----------------------------
