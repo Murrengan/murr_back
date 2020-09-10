@@ -11,19 +11,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: 1 job MURR
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
         run: |
-          echo ----------------------------
-          sudo apt-get install python3-venv
-          python3 -m venv venv
-          source venv/ben/activate
-          python --version
-          pip3 install --upgrade setuptools wheel
-          echo ----------------------------
-          pip3 install -r requirements.txt
-          echo ----------------------------
-          echo ----------------------------
-          pytest 
-          echo ----------------------------
-
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test with pytest
+        run: |
+          pytest
