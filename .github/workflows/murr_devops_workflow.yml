@@ -8,6 +8,9 @@ on:
 jobs:
   my_first_job:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
 
     steps:
       - uses: actions/checkout@v2
