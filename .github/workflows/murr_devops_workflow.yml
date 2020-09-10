@@ -20,7 +20,7 @@ jobs:
           python-version: '3.x'
           
       - name: Run Redis in docker
-        run: docker run redis 
+        run: docker run -d -p 6379 redis
         
       - name: Install dependencies
         run: |
