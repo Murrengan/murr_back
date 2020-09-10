@@ -1,4 +1,4 @@
-name: my_murr_ci
+name: murr_devops_name
 
 on:
   pull_request:
@@ -15,11 +15,8 @@ jobs:
       - name: 1 job MURR
         run: |
           echo ----------------------------
-          echo 1 job MURR
+          echo ----------------------------
+          ls -ls
+          echo ----------------------------
           echo ----------------------------
 
-      - name: 2 job murr
-        run: |
-          echo ----------------------------
-          echo 2 job murr
-          echo ----------------------------
