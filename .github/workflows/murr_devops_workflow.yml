@@ -20,7 +20,7 @@ jobs:
           python-version: '3.x'
           
       - name: Run Redis in docker
-        run: docker run --name redis_for_murr_back -p 127.0.0.1:6379:6379 redis
+        run: docker run --name redis_for_murr_back -p 127.0.0.1:6379:6379 redis -d
         
       - name: Install dependencies
         run: |
