@@ -1,8 +1,8 @@
 name: murr_devops_name
 
 on:
-  pull_request:
-    branches: [ murr_bot ]
+  push:
+    branches: [ develop ]
     
 
 jobs:
@@ -16,7 +16,8 @@ jobs:
         run: |
           echo ----------------------------
           echo ----------------------------
-          pytest
+          python -v
           echo ----------------------------
+          pip -v
           echo ----------------------------
 
