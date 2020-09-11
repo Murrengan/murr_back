@@ -1,22 +1,27 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from django_filters.rest_framework import DjangoFilterBackend
-
-from .models import Comment
-from .services import CommentPagination
-from .serializers import CommentSerializer
 from murr_rating.services import RatingActionsMixin
+from murren.views import MurrenPermissionMixin
+from .models import Comment
+from .serializers import CommentSerializer
+from .services import CommentPagination
 
 
-class CommentViewSet(RatingActionsMixin, ModelViewSet):
+class CommentViewSet(RatingActionsMixin, ModelViewSet, MurrenPermissionMixin):
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_fields = ('murr', 'parent', 'author')
+
+    def create(self, request, *args, **kwargs):
+        if self.murren_permission.is_banned(user=request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        super().create(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = Comment.objects.select_related('author', 'murr', 'parent')
