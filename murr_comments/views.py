@@ -21,7 +21,7 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
     def create(self, request, *args, **kwargs):
         if self.permission.is_banned(user=request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
-        super().create(request, *args, **kwargs)
+        return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = Comment.objects.select_related('author', 'murr', 'parent')
