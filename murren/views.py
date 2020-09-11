@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from murren.permissions import MurrenPermission
+from murren.permissions import MurrenPermission, Permission
 from murren.serializers import MurrenSerializers, PublicMurrenInfoSerializers
 
 Murren = get_user_model()
@@ -48,5 +48,5 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
 
-class MurrenPermissionMixin:
-    murren_permission = MurrenPermission()
+class PermissionMixin:
+    permission: Permission = MurrenPermission()

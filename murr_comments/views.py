@@ -5,13 +5,13 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from murr_rating.services import RatingActionsMixin
-from murren.views import MurrenPermissionMixin
+from murren.views import PermissionMixin
 from .models import Comment
 from .serializers import CommentSerializer
 from .services import CommentPagination
 
 
-class CommentViewSet(RatingActionsMixin, ModelViewSet, MurrenPermissionMixin):
+class CommentViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -19,7 +19,7 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet, MurrenPermissionMixin):
     filter_fields = ('murr', 'parent', 'author')
 
     def create(self, request, *args, **kwargs):
-        if self.murren_permission.is_banned(user=request.user):
+        if self.permission.is_banned(user=request.user):
             return Response(status=status.HTTP_403_FORBIDDEN)
         super().create(request, *args, **kwargs)
 
