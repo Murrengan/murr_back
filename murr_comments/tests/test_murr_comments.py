@@ -62,3 +62,18 @@ def test_murren_create_comment_for_comment(create_murren, create_murr):
     murr_comments_list = api.get(f'/api/murr_comments/{murr_card.pk}/')
 
     assert data['text'] == murr_comments_list.data['results'][0]['children'][0]['text']
+
+
+@pytest.mark.django_db
+def test_create_comment_when_murren_is_banned(create_murren_is_banned, create_murr):
+    murren = create_murren_is_banned
+    murr = create_murr
+    api = APIClient()
+    api.force_authenticate(user=murren)
+    data = {
+        "author": murren.pk,
+        "murr": murr.pk,
+        "text": "Текст моего секси комментария",
+    }
+    murr_comment_parent = api.post('/api/murr_comments/', data, format='json')
+    assert murr_comment_parent.status_code == 403
