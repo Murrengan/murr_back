@@ -12,18 +12,9 @@ from murr_back.settings import LOCALHOST
 
 from .models import MurrCard
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
+from rest_framework.decorators import action
 
 from .services import generate_user_cover
-
-from rest_framework import filters
-from rest_framework import generics
-
-class MurrCardSearch(generics.ListAPIView):
-    queryset = MurrCard.objects.all()
-    serializer_class = MurrCardSerializers
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['title']
-
 
 class MurrPagination(PageNumberPagination):
     page_size = 30
@@ -36,7 +27,7 @@ class MurrCardViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
     filter_backends = [DjangoFilterBackend]
-    filter_fields = ['owner']
+    filter_fields = ['owner', 'title']
 
     def get_queryset(self):
         queryset = MurrCard.objects.select_related('owner').order_by('-timestamp')
