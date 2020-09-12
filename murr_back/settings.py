@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'murr_bot.apps.MurrBotConfig',
     'murr_comments.apps.MurrCommentsConfig',
     'murr_rating.apps.MurrRatingConfig',
+    'murr_search.apps.MurrSearchConfig',
 ]
 
 SITE_ID = 1
