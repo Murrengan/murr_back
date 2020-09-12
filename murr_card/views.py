@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 from murr_back.settings import LOCALHOST
@@ -26,8 +27,9 @@ class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = AllMurrSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_fields = ['owner']
+    search_fields = ['title']
 
     def get_queryset(self):
         queryset = MurrCard.objects.select_related('owner').order_by('-timestamp')
