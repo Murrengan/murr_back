@@ -19,7 +19,6 @@ class SearchMurrenViewTests(APITestCase):
 
     def test_search_murren_username(self) -> None:
         search_text = 'murr'
-        self.client.force_authenticate(self.test_user)
         response = self.client.get(f'{self.api}{search_text}')
 
         self.assertEqual(response.status_code, 200)
@@ -49,7 +48,6 @@ class SearchMurrCardViewTests(APITestCase):
 
     def test_search_murren_name(self) -> None:
         search_text = 'card'
-        self.client.force_authenticate(self.test_user)
         response = self.client.get(f'{self.api}{search_text}')
 
         murr_card = response.data['results'][0]
