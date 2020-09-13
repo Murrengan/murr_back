@@ -22,7 +22,6 @@ class SearchMurrenViewTests(APITestCase):
         response = self.client.get(f'{self.api}{search_text}')
 
         self.assertEqual(response.status_code, 200)
-
         murren = response.data['results'][0]
         self.assertEqual(murren['username'], 'murren')
         self.assertEqual(murren['email'], 'admin@murrengan.ru')
@@ -50,8 +49,8 @@ class SearchMurrCardViewTests(APITestCase):
         search_text = 'card'
         response = self.client.get(f'{self.api}{search_text}')
 
-        murr_card = response.data['results'][0]
         self.assertEqual(response.status_code, 200)
+        murr_card = response.data['results'][0]
         self.assertEqual(murr_card['title'], 'murr card')
         self.assertEqual(murr_card['content'], 'murren test card')
         self.assertEqual(murr_card['owner_name'], 'murren')
