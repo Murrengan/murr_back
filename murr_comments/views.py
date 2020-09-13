@@ -8,13 +8,15 @@ from murr_rating.services import RatingActionsMixin
 from murren.views import PermissionMixin
 from .models import Comment
 from .serializers import CommentSerializer
+from murr_rating.services import RatingActionsMixin
+from .permissions import IsAuthenticatedAndOwnerOrReadOnly
 from .services import CommentPagination
 
 
 class CommentViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedAndOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_fields = ('murr', 'parent', 'author')
 

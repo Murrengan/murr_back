@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -11,6 +11,7 @@ from murr_rating.services import RatingActionsMixin
 from murren.views import PermissionMixin
 from .models import MurrCard, MurrCardStatus
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
+from .permissions import IsAuthenticatedAndOwnerOrReadOnly
 from .services import generate_user_cover
 
 
@@ -22,7 +23,7 @@ class MurrPagination(PageNumberPagination):
 
 class MurrCardViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
     serializer_class = AllMurrSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedAndOwnerOrReadOnly]
     pagination_class = MurrPagination
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['owner']
@@ -50,13 +51,6 @@ class MurrCardViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=201, headers=headers)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.owner == request.user:
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 class EditorImageForMurrCardView(APIView):
