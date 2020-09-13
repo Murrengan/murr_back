@@ -1,11 +1,11 @@
-name: murr_devops_name
+name: murr_devops
 
 on:
   pull_request:
     branches: [ develop ]
 
 jobs:
-  my_first_job:
+  test_on_pull_request_to_develop:
     runs-on: ubuntu-latest
     services:
       redis:
