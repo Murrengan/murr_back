@@ -1,22 +1,29 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from django_filters.rest_framework import DjangoFilterBackend
-
+from murr_rating.services import RatingActionsMixin
+from murren.views import PermissionMixin
 from .models import Comment
-from .services import CommentPagination
 from .serializers import CommentSerializer
 from murr_rating.services import RatingActionsMixin
+from .permissions import IsAuthenticatedAndOwnerOrReadOnly
+from .services import CommentPagination
 
 
-class CommentViewSet(RatingActionsMixin, ModelViewSet):
+class CommentViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedAndOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_fields = ('murr', 'parent', 'author')
+
+    def create(self, request, *args, **kwargs):
+        if self.permission.is_banned(user=request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = Comment.objects.select_related('author', 'murr', 'parent')
@@ -35,6 +42,14 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet):
             .get_queryset_descendants(Comment.objects.filter(id=instance.id), include_self=True)\
             .select_related('author', 'murr', 'parent')
         return self.get_cached_response(queryset)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['author'] = request.user
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

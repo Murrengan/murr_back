@@ -2,6 +2,18 @@ import datetime
 import os
 from datetime import timedelta
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN", ""),
+    integrations=[DjangoIntegration()],
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get("SECRET_KEY", '+ownf%0op*r)rytn0^u38y7sbp_w6nf-uf9cbtm0sk2o#b1^bj')
@@ -45,6 +57,7 @@ INSTALLED_APPS = [
     'murr_bot.apps.MurrBotConfig',
     'murr_comments.apps.MurrCommentsConfig',
     'murr_rating.apps.MurrRatingConfig',
+    'murr_search.apps.MurrSearchConfig',
 ]
 
 SITE_ID = 1
