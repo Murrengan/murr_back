@@ -8,6 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from murr_back.settings import LOCALHOST
 from murr_rating.services import RatingActionsMixin
+from murren.views import PermissionMixin
 from .models import MurrCard, MurrCardStatus
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
 from .services import generate_user_cover
@@ -19,7 +20,7 @@ class MurrPagination(PageNumberPagination):
     max_page_size = 60
 
 
-class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
+class MurrCardViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
     serializer_class = AllMurrSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = MurrPagination
@@ -38,6 +39,9 @@ class MurrCardViewSet(RatingActionsMixin, ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+        if self.permission.is_banned(user=request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         request.data['owner'] = request.user.id
         request.data['cover'] = generate_user_cover(request.data.get('cover'))
         request.data['status'] = request.data.get('status', MurrCardStatus.DRAFT.value)

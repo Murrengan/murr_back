@@ -40,7 +40,7 @@ class MurrCard(RatingAbstractModel, models.Model):
             img = Image.open(self.cover.path)
 
             if img.mode in ('RGBA', 'LA'):
-                fill_color = '#C3A1FF'
+                fill_color = '#c457fa'
                 background = Image.new(img.mode[:-1], img.size, fill_color)
                 background.paste(img, img.split()[-1])
                 img = background
