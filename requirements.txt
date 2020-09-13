@@ -71,3 +71,4 @@ zope.interface==5.1.0
 django-mptt==0.11.0
 django-filter==2.3.0
 drf-yasg==1.17.1
+django-enum-choices==2.1.2

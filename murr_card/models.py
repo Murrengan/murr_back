@@ -1,10 +1,19 @@
+from enum import Enum
+
 from PIL import Image
 from django.contrib.auth import get_user_model
 from django.db import models
+from django_enum_choices.fields import EnumChoiceField
 
 from murr_rating.models import RatingAbstractModel
 
 Murren = get_user_model()
+
+
+class MurrCardStatus(Enum):
+    RELEASE = 'release'
+    DRAFT = 'draft'
+    MODERATION = 'moderation'
 
 
 class MurrCard(RatingAbstractModel, models.Model):
@@ -13,6 +22,7 @@ class MurrCard(RatingAbstractModel, models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Murren, on_delete=models.CASCADE, related_name='murr_cards')
+    status = EnumChoiceField(MurrCardStatus, default=MurrCardStatus.DRAFT)
 
     def __str__(self):
         return self.title
