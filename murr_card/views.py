@@ -9,7 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 from murr_back.settings import LOCALHOST
 from murr_rating.services import RatingActionsMixin
 from murren.views import PermissionMixin
-from .models import MurrCard
+from .models import MurrCard, MurrCardStatus
 from .serializers import MurrCardSerializers, EditorImageForMurrCardSerializers, AllMurrSerializer
 from .services import generate_user_cover
 
@@ -28,7 +28,9 @@ class MurrCardViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
     filter_fields = ['owner']
 
     def get_queryset(self):
-        queryset = MurrCard.objects.select_related('owner').order_by('-timestamp')
+        queryset = MurrCard.objects.select_related('owner')\
+            .filter(status=MurrCardStatus.RELEASE)\
+            .order_by('-timestamp')
         return queryset
 
     def retrieve(self, request, *args, **kwargs):
@@ -42,6 +44,7 @@ class MurrCardViewSet(RatingActionsMixin, ModelViewSet, PermissionMixin):
 
         request.data['owner'] = request.user.id
         request.data['cover'] = generate_user_cover(request.data.get('cover'))
+        request.data['status'] = request.data.get('status', MurrCardStatus.DRAFT.value)
         serializer = MurrCardSerializers(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
