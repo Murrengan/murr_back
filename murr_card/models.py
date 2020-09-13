@@ -1,16 +1,28 @@
+from enum import Enum
+
 from PIL import Image
 from django.contrib.auth import get_user_model
 from django.db import models
+from django_enum_choices.fields import EnumChoiceField
+
+from murr_rating.models import RatingAbstractModel
 
 Murren = get_user_model()
 
 
-class MurrCard(models.Model):
+class MurrCardStatus(Enum):
+    RELEASE = 'release'
+    DRAFT = 'draft'
+    MODERATION = 'moderation'
+
+
+class MurrCard(RatingAbstractModel, models.Model):
     title = models.CharField(max_length=224)
     cover = models.ImageField(blank=True, null=True, upload_to='murr_cover/%Y/%m/%d/')
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Murren, on_delete=models.CASCADE, related_name='murr_cards')
+    status = EnumChoiceField(MurrCardStatus, default=MurrCardStatus.DRAFT)
 
     def __str__(self):
         return self.title
@@ -28,7 +40,7 @@ class MurrCard(models.Model):
             img = Image.open(self.cover.path)
 
             if img.mode in ('RGBA', 'LA'):
-                fill_color = '#C3A1FF'
+                fill_color = '#c457fa'
                 background = Image.new(img.mode[:-1], img.size, fill_color)
                 background.paste(img, img.split()[-1])
                 img = background

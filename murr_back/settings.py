@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # 3rd party
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
     'corsheaders',
     'djoser',
     'channels',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     'murr_bot.apps.MurrBotConfig',
     'murr_comments.apps.MurrCommentsConfig',
     'murr_rating.apps.MurrRatingConfig',
+    'murr_search.apps.MurrSearchConfig',
 ]
 
 SITE_ID = 1
@@ -72,9 +74,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'murr_back.middleware.CheckRecaptchaMiddleware',
 ]
+
+IS_CAPTCHA = os.getenv("IS_CAPTCHA")
+
+if IS_CAPTCHA:
+    MIDDLEWARE.append('murr_back.middleware.CheckRecaptchaMiddleware')
 
 AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',

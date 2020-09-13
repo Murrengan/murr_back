@@ -8,9 +8,12 @@ Murren = get_user_model()
 
 @pytest.fixture
 def create_murren():
-    murren = Murren.objects.create_user(username='TestMurrenName',
-                                        password='SecretPassword',
-                                        email='test_email@mail.ru')
+    murren = Murren.objects.create_user(
+        username='TestMurrenName',
+        password='SecretPassword',
+        email='test_email@mail.ru',
+        is_banned=False,
+    )
     murren.save()
     return murren
 
@@ -24,3 +27,15 @@ def create_murr():
         owner=murren,
     )
     return murr
+
+
+@pytest.fixture
+def create_murren_is_banned():
+    murren = Murren.objects.create_user(
+        username='TestMurrenName',
+        password='SecretPassword',
+        email='test_email@mail.ru',
+        is_banned=True,
+    )
+    murren.save()
+    return murren
