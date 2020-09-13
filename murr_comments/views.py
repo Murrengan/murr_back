@@ -1,7 +1,4 @@
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -9,12 +6,13 @@ from .models import Comment
 from .services import CommentPagination
 from .serializers import CommentSerializer
 from murr_rating.services import RatingActionsMixin
+from .permissions import IsAuthenticatedAndOwnerOrReadOnly
 
 
 class CommentViewSet(RatingActionsMixin, ModelViewSet):
     serializer_class = CommentSerializer
     pagination_class = CommentPagination
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedAndOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filter_fields = ('murr', 'parent', 'author')
 
@@ -35,13 +33,6 @@ class CommentViewSet(RatingActionsMixin, ModelViewSet):
             .get_queryset_descendants(Comment.objects.filter(id=instance.id), include_self=True)\
             .select_related('author', 'murr', 'parent')
         return self.get_cached_response(queryset)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.author == request.user:
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     def get_cached_response(self, queryset):
         page = self.paginate_queryset(queryset.get_cached_trees())
