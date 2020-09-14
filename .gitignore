@@ -7,3 +7,4 @@ venv/
 !media/default_murren_avatar.png
 !media/tanochka.jpg
 staticfiles/
+.log
