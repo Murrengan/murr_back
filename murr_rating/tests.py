@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase
 
-from murr_card.models import MurrCard
+from murr_card.models import MurrCard, MurrCardStatus
 from murren.models import Murren
 
 
@@ -9,7 +9,12 @@ class RatingTests(APITestCase):
     def setUp(self):
         self.api = r'/api/murr_card'
         self.test_user = Murren.objects.create(username='test_rating', email='admin@murrengan.ru')
-        self.test_card = MurrCard.objects.create(title='test_rating', content='', owner=self.test_user)
+        self.test_card = MurrCard.objects.create(
+            title='test_rating',
+            content='',
+            owner=self.test_user,
+            status=MurrCardStatus.RELEASE,
+        )
 
     def test_create_rating(self):
         like_card_url = f'{self.api}/{self.test_card.id}/like/'
