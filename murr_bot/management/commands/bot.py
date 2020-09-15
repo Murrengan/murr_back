@@ -21,7 +21,7 @@ class Command(BaseCommand):
         executor.start_polling(dp)
 
 
-TOKEN = os.environ.get("BOT_TOKEN", '737836476:AAE8WivMe26JfPm0hu28mAkBzpuxf5fs6Kk')
+TOKEN = os.environ.get("BOT_TOKEN", '635496211:AAFGUjMa_NgSQ5c-Cr_19qLnq3HDZigrwx4')
 
 storage = RedisStorage2(host=os.environ.get("REDIS_HOST", 'localhost'), db=5)
 bot = Bot(token=TOKEN)
