@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from murr_back.settings import LOCALHOST
+from murr_back.settings import BACKEND_URL
 from murr_rating.services import RatingActionsMixin
 from .models import MurrCard, MurrCardStatus
 from .permissions import IsAuthenticatedAndOwnerOrReadOnly
@@ -56,6 +56,6 @@ class EditorImageForMurrCardView(APIView):
         murr_dict = {"success": 0, "file": {"url": ""}}
         if serializer.is_valid():
             serializer.save()
-            url = LOCALHOST + serializer.data['murr_editor_image']
+            url = BACKEND_URL + serializer.data['murr_editor_image']
             murr_dict = {"success": 1, "file": {"url": url}}
         return Response(murr_dict)
