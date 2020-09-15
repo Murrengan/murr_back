@@ -28,22 +28,3 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
-
-
-# on:
-#   push:
-#     branches: [ develop ]
-# jobs:
-#   my_first_job:
-#     runs-on: ubuntu-latest   
-#     steps:
-#       - name: TEST SSH CONNECTION
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: 35.228.83.205
-#           username: murrengan_test
-#           key: ${{ secrets.PRIVATE_KEY }}
-#           port: 22
-#           script: |
-#             cd ~
-#             mkdir delete1
