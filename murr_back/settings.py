@@ -22,7 +22,7 @@ DEBUG = int(os.environ.get("DEBUG", default=1))
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", '*').split(" ")
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -30,8 +30,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+]
 
-    # 3rd party
+THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
@@ -49,8 +50,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'debug_toolbar',
+]
 
-    # local
+LOCAL_APPS = [
     'murren.apps.MurrenConfig',
     'murr_card.apps.MurrCardConfig',
     'murr_chat.apps.MurrChatConfig',
@@ -59,6 +62,8 @@ INSTALLED_APPS = [
     'murr_rating.apps.MurrRatingConfig',
     'murr_search.apps.MurrSearchConfig',
 ]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 SITE_ID = 1
 
@@ -265,3 +270,7 @@ LOGGING = {
         }
     },
 }
+
+if DEBUG:
+    MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
+    INTERNAL_IPS = ("127.0.0.1",)
