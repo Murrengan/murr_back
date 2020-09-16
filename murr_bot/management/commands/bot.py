@@ -21,7 +21,7 @@ class Command(BaseCommand):
         dp.middleware.setup(ThrottlingMiddleware())
         executor.start_polling(dp)
 
-
+        
 storage = RedisStorage2(host=os.getenv("REDIS_HOST", "127.0.0.1"), 
                         port=os.getenv("REDIS_PORT", 6379), db=5)
 bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
