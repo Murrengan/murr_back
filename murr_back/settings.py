@@ -197,7 +197,8 @@ RECAPTCHA_URL_PROTECTED = (
     'auth/users/',
     'auth/users/reset_password/',
     'api/murren/token_create/',
-    'api/murr_card/'
+    'api/murr_card/',
+    'api/murr_comments/'
 )
 
 CHANNEL_LAYERS = {
