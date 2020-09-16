@@ -9,6 +9,7 @@ from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.utils.exceptions import Throttled
 from django.core.management import BaseCommand
+from django.conf import settings
 
 from murr_bot.models import Coub
 
@@ -20,11 +21,10 @@ class Command(BaseCommand):
         dp.middleware.setup(ThrottlingMiddleware())
         executor.start_polling(dp)
 
-
-TOKEN = os.environ.get("BOT_TOKEN", '635496211:AAFGUjMa_NgSQ5c-Cr_19qLnq3HDZigrwx4')
-
-storage = RedisStorage2(host=os.environ.get("REDIS_HOST", 'localhost'), db=5)
-bot = Bot(token=TOKEN)
+        
+storage = RedisStorage2(host=os.getenv("REDIS_HOST", "127.0.0.1"), 
+                        port=os.getenv("REDIS_PORT", 6379), db=5)
+bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
 dp = Dispatcher(bot, storage=storage)
 
 
