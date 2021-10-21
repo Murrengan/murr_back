@@ -7,7 +7,7 @@ atomicwrites==1.4.0
 attrs==19.3.0
 autobahn==20.7.1
 Automat==20.2.0
-Babel==2.8.0
+Babel==2.9.1
 certifi==2020.6.20
 cffi==1.14.1
 channels==2.4.0
